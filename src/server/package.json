@@ -1,0 +1,16 @@
+{
+  "name": "indigio",
+  "version": "0.1.0",
+  "description": "Indigio is a chatting app available on the web and as a desktop application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "Will Allen",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "socket.io": "^2.2.0",
+    "sqlite3": "^4.0.9"
+  }
+}

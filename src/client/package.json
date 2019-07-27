@@ -1,0 +1,14 @@
+{
+  "name": "indigio",
+  "version": "0.1.0",
+  "description": "Indigio is a chatting app available on the web and as a desktop application",
+  "main": "client.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Will Allen",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^5.0.7"
+  }
+}
