@@ -9,7 +9,7 @@ const publicDir = 'public';
 const errorDir = path.join(publicDir, 'errors');
 var server = http.Server(app);
 var io = sio(server);
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 3000;
 server.listen(port);
 
 app.use(express.static(path.join(__dirname, publicDir)));

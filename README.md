@@ -4,11 +4,7 @@ Indigio is an open source chatting app, and it's available on the web and as a d
 
 ## Deployment
 
-As of now, Indigio has not been deployed, as there are no stable releases yet.
-
-## Contributing
-
-If you would like to contribute to Indigio, let me know and I'll get back to you.
+Indigio will eventually be deployed on [Heroku](https://www.heroku.com/). As of now, there are no stable releases, so the app has not been deployed.
 
 ## Security concerns
 
