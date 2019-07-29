@@ -1,3 +1,5 @@
+const url = window.location.host;
+
 function showError(msg) {
     var errorText = document.getElementById('error-text');
     errorText.innerHTML = msg;
@@ -29,7 +31,7 @@ function login() {
     var username = getUsername();
     if (username === null) return;
     var password = getPassword();
-    var socket = io.connect('localhost');
+    var socket = io.connect(url);
     // do key exchange
     socket.emit('login', { 'username': username, 'password': password });
     socket.on('validLogin', (data) => {

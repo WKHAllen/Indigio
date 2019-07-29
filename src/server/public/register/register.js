@@ -1,3 +1,5 @@
+const url = window.location.host;
+
 function showError(msg) {
     var errorText = document.getElementById('error-text');
     errorText.innerHTML = msg;
@@ -68,7 +70,7 @@ function register() {
     if (email === null) return;
     var password = getPassword();
     if (password === null) return;
-    var socket = io.connect('localhost');
+    var socket = io.connect(url);
     // do key exchange
     socket.emit('register', { 'username': username, 'displayname': displayname, 'email': email, 'password': password });
     socket.on('validRegistration', (data) => {

@@ -32,14 +32,15 @@ function login(socket, data) {
     database.verifyLogin(data.username, data.password, (res) => {
         socket.emit('validLogin', { 'res': res });
         if (res) {
-            // all main application functionality, such as sending/receiving messages (put into other function)
             console.log('USER SUCCESSFULLY LOGGED IN');
+            // all main application functionality, such as sending/receiving messages (put into other function)
         }
     });
 }
 
 function main() {
     io.on('connection', (socket) => {
+        // do key exchange
         var date = (new Date()).toString();
         console.log(`[${date}] user joined`);
         socket.on('register', (data) => { register(socket, data); });

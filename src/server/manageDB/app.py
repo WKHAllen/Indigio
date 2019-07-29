@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from flask_cors import cross_origin
 import sqlite3
 import time
 
@@ -15,7 +14,6 @@ def logCommand(command):
             f.write("[{}] {}\n".format(timestamp, command))
 
 @app.route("/", methods=["GET", "POST"])
-@cross_origin()
 def index():
     if request.method == "GET":
         return render_template("index.html")
