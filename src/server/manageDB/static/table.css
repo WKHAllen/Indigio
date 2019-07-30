@@ -1,0 +1,166 @@
+:root {
+    --std-padding: 8px;
+    --std-border-radius: 4px;
+    --std-outline: 0 0 0 2pt #8fafdf;
+    --primary-color: #001f4f;
+    --secondary-color: white;
+    --secondary-hover: #bfcfff;
+    --secondary-active: #7f9fff;
+    --primary-text-color: white;
+    --secondary-text-color: black;
+    --tertiary-text-color: #7f9fff;
+    --tertiary-text-hover: #5f7fef;
+    --tertiary-text-active: #3f5fdf;
+    --table-color: #0f2f8f;
+    --table-hover: #1f4faf;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--primary-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--tertiary-text-color);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--tertiary-text-hover);
+}
+
+::-webkit-scrollbar-thumb:active {
+    background-color: var(--tertiary-text-active);
+}
+
+::selection {
+    background-color: var(--secondary-active);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 16px;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 14pt;
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+}
+
+h1 {
+    padding: 16px;
+    font-weight: 500;
+}
+
+input[type=text] {
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
+    width: calc(100% - 16px);
+    padding: 8px;
+    border-radius: var(--std-border-radius);
+    border: none;
+    outline: none;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 12pt;
+}
+
+input[type=text]:hover {
+    background-color: var(--secondary-hover);
+}
+
+input[type=text]:active {
+    background-color: var(--secondary-active);
+}
+
+input[type=text]:focus {
+    background-color: var(--secondary-active);
+    box-shadow: var(--std-outline);
+}
+
+button {
+    background-color: var(--secondary-color);
+    color: var(--secondary-text-color);
+    padding: 8px;
+    border-radius: var(--std-border-radius);
+    border: none;
+    outline: none;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 12pt;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--secondary-hover);
+}
+
+button:active {
+    background-color: var(--secondary-active);
+}
+
+button:focus {
+    box-shadow: var(--std-outline);
+}
+
+.centered-text {
+    text-align: center;
+}
+
+.padded {
+    margin: var(--std-padding) 0;
+}
+
+.side-padded {
+    padding: 0 var(--std-padding);
+}
+
+.middle-content {
+    width: 100%;
+}
+
+.main-form {
+    margin: auto;
+}
+
+.main-table {
+    margin: auto;
+    width: 100%;
+    padding-top: 8px;
+}
+
+th, td {
+    text-align: left;
+    padding: var(--std-padding);
+}
+
+table {
+    border-spacing: 0;
+}
+
+th {
+    font-weight: 500;
+    font-size: 16pt;
+    border-bottom: 2px solid var(--tertiary-text-color);
+}
+
+tr {
+    background-color: var(--table-color);
+}
+
+tr:hover {
+    background-color: var(--table-hover);
+}
+
+td {
+    font-size: 12pt;
+    border-bottom: 1px solid var(--tertiary-text-color);
+}
+
+table tbody tr:last-child td {
+    border-bottom: 0;
+}
