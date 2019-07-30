@@ -1,10 +1,13 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcrypt');
+const db = require('./db.js');
 
 const dbDir = 'db';
 const dbFile = path.join(dbDir, 'main.db');
 const saltRounds = 14;
+
+var mainDB = new db.DB(path.join(__dirname, dbFile));
 
 function getTime() {
     return Math.floor(new Date().getTime() / 1000);
@@ -23,12 +26,6 @@ function execute(db, stmt, params, callback) {
         if (callback)
             callback(err, rows);
     });
-}
-
-function executeOne(stmt, callback) {
-    var db = openDB();
-    execute(db, stmt, [], callback);
-    closeDB(db);
 }
 
 function executeMany(stmts, callback) {
@@ -89,237 +86,216 @@ function init() {
 }
 
 function createUser(username, displayname, email, password, callback) {
-    var db = openDB();
     var sql = `SELECT username, email FROM users WHERE username = ? OR email = ?;`;
     var params = [username, email];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (rows.length > 0) {
-            callback(false);
+            if (callback) callback(false);
         } else {
             bcrypt.hash(password, saltRounds, (err, hash) => {
                 if (err) throw err;
                 sql = `INSERT INTO users (username, displayname, email, password, joinTimestamp) VALUES (?, ?, ?, ?, ?);`;
                 params = [username, displayname, email, hash, getTime()];
-                execute(db, sql, params, (err, rows) => {
+                mainDB.execute(sql, params, (err, rows) => {
                     if (err) throw err;
                 });
-                callback(true);
+                if (callback) callback(true);
             });
         }
     });
-    closeDB(db);
 }
 
 function changePassword(username, newPassword) {
-    var db = openDB();
     bcrypt.hash(newPassword, saltRounds, (err, hash) => {
         var sql = `UPDATE users SET password = ? WHERE username = ?;`;
         var params = [hash, username];
-        execute(db, sql, params, (err, rows) => {
+        mainDB.execute(sql, params, (err, rows) => {
             if (err) throw err;
         });
     });
-    closeDB(db);
 }
 
 function setUserDisplayname(username, newDisplayname) {
-    var db = openDB();
     var sql = `UPDATE users SET displayname = ? WHERE username = ?;`;
     var params = [newDisplayname, username];
-    execute(db, sql, params);
-    closeDB(db);
+    mainDB.execute(sql, params);
 }
 
 function setUserImage(username, imageURL) {
-    var db = openDB();
     var sql = `UPDATE users SET imageURL = ? WHERE username = ?;`;
     var params = [imageURL, username];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
-    closeDB(db);
 }
 
 function addFriend(username1, username2) {
-    var db = openDB();
     var sql = `SELECT id1 FROM friends WHERE id1 = (SELECT id FROM users WHERE username = ?) AND id2 = (SELECT id FROM users WHERE username = ?);`;
     var params = [username1, username2];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (rows.length === 0) {
             params = [username2, username1];
-            execute(db, sql, params, (err, rows) => {
+            mainDB.execute(sql, params, (err, rows) => {
                 if (err) throw err;
                 if (rows.length === 0) {
                     var now = getTime();
                     sql = `INSERT INTO friends (id1, id2, addTimestamp) VALUES ((SELECT id FROM users WHERE username = ?), (SELECT id FROM users WHERE username = ?), ?);`;
                     params = [username1, username2, now];
-                    execute(db, sql, params, (err, rows) => {
+                    mainDB.execute(sql, params, (err, rows) => {
                         if (err) throw err;
                     });
                     params = [username2, username1, now];
-                    execute(db, sql, params, (err, rows) => {
+                    mainDB.execute(sql, params, (err, rows) => {
                         if (err) throw err;
                     });
                 }
             });
         }
     });
-    closeDB(db);
 }
 
 function removeFriend(username1, username2) {
-    var db = openDB();
     var sql = `DELETE FROM friends WHERE id1 = (SELECT id FROM users WHERE username = ?) AND id2 = (SELECT id FROM users WHERE username = ?);`;
     var params = [username1, username2];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
     params = [username2, username1];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
-    closeDB(db);
 }
 
 function getFriends(username, callback) {
-    var db = openDB();
     var sql = `SELECT username FROM users JOIN (SELECT id2 FROM friends WHERE id1 = (SELECT id FROM users WHERE username = ?)) userfriends ON users.id = userfriends.id2;`;
     var params = [username];
-    execute(db, sql, params, callback);
-    closeDB(db);
+    mainDB.execute(sql, params, callback);
 }
 
 function createRoom(roomType, name, callback) {
-    // If two rooms are created at the same time, they will both try to use the same ID.
-    // So when this happens, an error is thrown, and they will try again.
-    // This is not the most perfect solution, but it seems to work without problems.
-    var db = openDB();
-    var sql = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
-    execute(db, sql, [], (err, rows) => {
+    var sql = `INSERT INTO rooms (roomType, name, createTimestamp) VALUES (?, ?, ?);`;
+    var params = [roomType, name, getTime()];
+    var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
+    mainDB.executeAfter(sql, params, (err, rows) => {
+        if (err) createRoom(roomType, name, callback);
+    }, sqlAfter, [], (err, rows) => {
         if (err) throw err;
-        var roomID = 1;
-        if (rows.length > 0) {
-            roomID = rows[0].id + 1;
-        }
-        sql = `INSERT INTO rooms (id, roomType, name, createTimestamp) VALUES (?, ?, ?, ?);`;
-        var params = [roomID, roomType, name, getTime()];
-        execute(db, sql, params, (err, rows) => {
-            if (err) {
-                createRoom(roomType, name, callback);
-            } else {
-                callback(roomID);
-            }
-        });
+        if (callback) callback(rows[0].id);
     });
-    closeDB(db);
 }
 
 function deleteRoom(roomID) {
-    // delete all associated users from `roomUsers` and all associated messages from `messages`
+    var sql = `DELETE FROM rooms WHERE id = ?;`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+    sql = `DELETE FROM roomUsers WHERE roomid = ?;`;
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+    sql = `DELETE FROM messages WHERE roomid = ?;`;
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
 }
 
 function addToRoom(roomID, username) {
-    var db = openDB();
     var sql = `SELECT roomid FROM roomUsers WHERE roomid = ? AND userid = (SELECT id FROM users WHERE username = ?);`;
     var params = [roomID, username2];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (rows.length === 0) {
             sql = `INSERT INTO roomUsers (roomid, userid, joinTimestamp) VALUES (?, (SELECT id FROM users WHERE username = ?), ?);`;
             params = [roomID, username, getTime()];
-            execute(db, sql, params, (err, rows) => {
+            mainDB.execute(sql, params, (err, rows) => {
                 if (err) throw err;
             });
         }
     })
-    closeDB(db);
 }
 
 function removeFromRoom(roomID, username) {
-    var db = openDB();
     var sql = `DELETE FROM roomUsers WHERE roomid = ? AND userid = (SELECT id FROM users WHERE username = ?);`;
     var params = [roomID, username];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
-    closeDB(db);
 }
 
 function setRoomName(roomID, name) {
-    var db = openDB();
     var sql = `UPDATE rooms SET name = ? WHERE id = ?;`;
     var params = [name, roomID];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
-    closeDB(db);
 }
 
 function setRoomImage(roomID, imageURL) {
-    var db = openDB();
     var sql = `UPDATE rooms SET imageURL = ? WHERE id = ?;`;
     var params = [imageURL, roomID];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
     });
-    closeDB(db);
 }
 
 function getRooms(username, callback) {
-    var db = openDB();
     var sql = `SELECT roomid FROM roomUsers WHERE userid = (SELECT id FROM users WHERE username = ?);`;
     var params = [username];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        callback(rows);
+        if (callback) callback(rows);
     });
-    closeDB(db);
 }
 
 function getUsersInRoom(roomID, callback) {
-    var db = openDB();
     var sql = `SELECT username FROM users WHERE id = (SELECT userid FROM roomUsers WHERE roomid = ?);`;
-    var params = [username];
-    execute(db, sql, params, (err, rows) => {
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        callback(rows);
+        if (callback) callback(rows);
     });
-    closeDB(db);
+}
+
+function createMessage(text, username, roomID, callback) {
+    var sql = `INSERT INTO messages (text, userid, roomid, createTimestamp) VALUES (?, (SELECT id FROM users WHERE username = ?), ?, ?);`;
+    var params = [text, username, roomID, getTime()];
+    var sqlAfter = `SELECT id FROM messages ORDER BY id DESC LIMIT 1;`;
+    mainDB.executeAfter(sql, params, (err, rows) => {
+        if (err) createMessage(text, username, roomID, callback);
+    }, sqlAfter, [], (err, rows) => {
+        if (err) createMessage(text, username, roomID, callback);
+        if (callback) callback(rows[0].id);
+    });
 }
 
 function verifyLogin(username, password, callback) {
-    var db = openDB();
     var sql = `SELECT password FROM users WHERE username = ?;`;
     var params = [username];
-    execute(db, sql, params, (err, rows) => {
+    mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (rows.length > 1) throw `ERROR: multiple instances of user ${username}`;
         if (rows.length === 0) {
-            closeDB(db);
-            callback(false);
+            if (callback) callback(false);
         } else {
             bcrypt.compare(password, rows[0].password, (err, res) => {
                 if (err) throw err;
                 if (res) {
                     sql = `UPDATE users SET lastLogin = ? WHERE username = ?;`;
                     params = [getTime(), username];
-                    execute(db, sql, params, (err, rows) => {
+                    mainDB.execute(sql, params, (err, rows) => {
                         if (err) throw err;
                     });
                 }
-                closeDB(db);
-                callback(res);
+                if (callback) callback(res);
             });
         }
     });
 }
 
 module.exports = {
-    'execute': execute,
-    'executeOne': executeOne,
-    'executeMany': executeMany,
     'createUser': createUser,
     'changePassword': changePassword,
     'setUserDisplayname': setUserDisplayname,
@@ -328,11 +304,14 @@ module.exports = {
     'removeFriend': removeFriend,
     'getFriends': getFriends,
     'createRoom': createRoom,
+    'deleteRoom': deleteRoom,
     'addToRoom': addToRoom,
     'removeFromRoom': removeFromRoom,
     'setRoomName': setRoomName,
     'setRoomImage': setRoomImage,
     'getRooms': getRooms,
+    'getUsersInRoom': getUsersInRoom,
+    'createMessage': createMessage,
     'verifyLogin': verifyLogin
 }
 
