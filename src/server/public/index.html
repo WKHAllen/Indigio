@@ -8,10 +8,55 @@
         <script type="text/javascript" src="constants.js"></script>
         <script type="text/javascript" src="main.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">Welcome, <span id="username">friend</span>!</h1>
-        <div class="middle-content">
-            <p>Hello! Welcome to Indigio. Currently, this page contains nothing at all, but in the future it will show all of your direct messages.</p>
+    <body class="main">
+        <div class="menu-bar">
+            <ul id="menu-list">
+                <!-- settings, logout, etc. -->
+                <li><a href="/settings/"><button>Settings</button></a></li><!--
+                --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+        </div>
+        <div class="main-screen">
+            <div id="rooms-panel">
+                <ul id="room-list">
+                    <!-- list of rooms -->
+                    <li id="insert-room-id-here-1" onclick="console.log('you clicked 1');">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 1</span>
+                    </li>
+                    <li id="insert-room-id-here-2" onclick="console.log('you clicked 2');">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 2</span>
+                    </li>
+                    <li id="insert-room-id-here-3" onclick="console.log('you clicked 3');">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 3</span>
+                    </li>
+                </ul>
+            </div>
+            <div id="current-room">
+                <div id="messages">
+                    <!-- messages in the currently selected room -->
+                    <div class="message">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico">
+                        <span class="username">User 1</span>
+                        <span class="timestamp">Timestamp 1</span>
+                        <span class="message-content">Message 1</span>
+                    </div>
+                    <div class="message">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico">
+                        <span class="username">User 2</span>
+                        <span class="timestamp">Timestamp 2</span>
+                        <span class="message-content">Message 2</span>
+                    </div>
+                    <div class="message">
+                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico">
+                        <span class="username">User 3</span>
+                        <span class="timestamp">Timestamp 3</span>
+                        <span class="message-content">Message 3</span>
+                    </div>
+                </div>
+                <div id="input">
+                    <input type="text" id="main-input" maxlength="2000">
+                </div>
+            </div>
         </div>
     </body>
 </html>

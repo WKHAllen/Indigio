@@ -1,7 +1,16 @@
 :root {
+    --scrollbar-width: 8px;
     --std-padding: 8px;
     --std-border-radius: 4px;
     --std-outline: 0 0 0 2pt #8fafdf;
+    --menu-list-height: 50px;
+    --rooms-panel-width: 250px;
+    --room-li-height: 50px;
+    --room-li-img-height: 32px;
+    --message-height: 32px;
+    --message-img-height: 24px;
+    --input-height: 60px;
+    --input-box-height: 24px;
     --primary-color: #001f4f;
     --secondary-color: white;
     --secondary-hover: #bfcfff;
@@ -12,19 +21,28 @@
     --tertiary-text-hover: #5f7fef;
     --tertiary-text-active: #3f5fdf;
     --error-text-color: #cf0000;
+    --menu-color: #1f3f8f;
+    --menu-hover: #2f5faf;
+    --menu-active: #3f7fcf;
+    --menu-dark-color: #2f0f8f;
+    --menu-dark-hover: #3f1faf;
+    --menu-dark-active: #4f2fcf;
+    --input-color: #2f4fbf;
+    --message-user-color: #00afff;
+    --message-timestamp-color: #9f9fcf;
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: var(--scrollbar-width);
 }
 
 ::-webkit-scrollbar-track {
-    background-color: var(--primary-color);
+    background-color: rgba(127, 192, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
     background-color: var(--tertiary-text-color);
-    border-radius: 2px;
+    border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -42,6 +60,11 @@
 * {
     margin: 0;
     padding: 0;
+}
+
+html {
+    width: 100%;
+    height: 100%;
 }
 
 body {
@@ -68,8 +91,8 @@ p {
 input[type=text], input[type=email], input[type=password] {
     background-color: var(--secondary-color);
     color: var(--secondary-text-color);
-    width: calc(100% - 16px);
-    padding: 8px;
+    width: calc(100% - 2 * var(--std-padding));
+    padding: var(--std-padding);
     border-radius: var(--std-border-radius);
     border: none;
     outline: none;
@@ -182,4 +205,166 @@ a:focus {
 .smaller-text {
     font-size: 11pt;
     font-style: italic;
+}
+
+.main {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#menu-list {
+    list-style-type: none;
+    margin: 0;
+    background-color: var(--menu-color);
+    height: var(--menu-list-height);
+}
+
+#menu-list li {
+    display: inline-block;
+    height: var(--menu-list-height);
+}
+
+#menu-list li a button {
+    color: var(--secondary-color);
+    background-color: var(--menu-color);
+    height: var(--menu-list-height);
+    padding: 0 calc(var(--std-padding) * 1.5);
+    border-radius: 0;
+    outline: none;
+}
+
+#menu-list li a button:hover {
+    background-color: var(--menu-hover);
+}
+
+#menu-list li a button:active {
+    background-color: var(--menu-active);
+}
+
+#menu-list li a button:focus {
+    box-shadow: none;
+}
+
+.main-screen {
+    width: 100%;
+    height: calc(100vh - var(--menu-list-height));
+}
+
+.main-screen::after {
+    clear: both;
+}
+
+.height-expand {
+    align-items: stretch;
+}
+
+#rooms-panel {
+    background-color: var(--menu-dark-color);
+    float: left;
+    width: var(--rooms-panel-width);
+    height: 100%;
+}
+
+#room-list {
+    width: var(--rooms-panel-width);
+    height: 100%;
+    list-style-type: none;
+    overflow-y: scroll;
+}
+
+#room-list li {
+    height: var(--room-li-height);
+    line-height: var(--room-li-height);
+}
+
+#room-list li:hover {
+    cursor: pointer;
+}
+
+#room-list li img {
+    width: var(--room-li-img-height);
+    height: var(--room-li-img-height);
+    padding: calc((var(--room-li-height) - var(--room-li-img-height)) / 2);
+    float: left;
+}
+
+#room-list li span {
+    width: calc(var(--rooms-panel-width) - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    float: left;
+    font-size: 12pt;
+}
+
+#room-list li::after {
+    clear: both;
+}
+
+#room-list li:hover {
+    background-color: var(--menu-dark-hover);
+}
+
+#room-list li:active {
+    background-color: var(--menu-dark-active);
+}
+
+#current-room {
+    float: left;
+    width: calc(100% - var(--rooms-panel-width));
+    height: calc(100vh - var(--menu-list-height));
+}
+
+#messages {
+    width: calc(100% - 2 * var(--std-padding));
+    height: calc(100% - var(--input-height) - 2 * var(--std-padding));
+    padding: var(--std-padding);
+    overflow-y: scroll;
+}
+
+.message {
+    min-height: var(--message-height);
+    line-height: var(--message-height);
+    font-size: 12pt;
+    overflow-y: auto;
+}
+
+.message img {
+    width: var(--message-img-height);
+    height: var(--message-img-height);
+    padding: calc((var(--message-height) - var(--message-img-height)) / 2);
+}
+
+.message .username {
+    color: var(--message-user-color);
+}
+
+.message .timestamp {
+    color: var(--message-timestamp-color);
+}
+
+.message .message-content {
+    color: var(--primary-text-color);
+}
+
+.message img, .message p .username, .message p .timestamp, .message p .message-content {
+    padding-right: var(--std-padding);
+    float: left;
+    display: table;
+    white-space: normal;
+}
+
+.message::after {
+    clear: both;
+}
+
+#input {
+    background-color: var(--input-color);
+    padding: calc((var(--input-height) - var(--input-box-height) - 2 * var(--std-padding)) / 2);
+}
+
+#input input {
+    height: var(--input-box-height);
 }

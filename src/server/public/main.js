@@ -5,16 +5,31 @@ var password = localStorage.getItem(localPassword);
 
 var loaded = false;
 
-function main(socket) {
-    document.getElementById('username').innerHTML = username;
-    // main application (get friends, DMs, messages, etc.)
+var socket;
+
+function onEnter() {
+    if (event.keyCode === 13) {
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+    var mainInput = document.getElementById('main-input');
+    socket.emit('newMessage', { 'text': mainInput.value, 'username': username, 'password': password });
+    mainInput.value = "";
+}
+
+function main() {
+    document.getElementById('main-input').setAttribute('onkeydown', 'onEnter();');
+    // emit events for getting friends, rooms, messages, etc.
+    // set socket.on events for receiving new messages, adding/removing rooms, etc.
 }
 
 function start() {
     if (username === null || password === null) {
         window.location.replace('/login/');
     } else {
-        var socket = io.connect(url);
+        socket = io.connect(url);
         // do key exchange
         socket.emit('login', { 'username': username, 'password': password });
         socket.on('validLogin', (data) => {
@@ -22,9 +37,9 @@ function start() {
                 window.location.replace('/login/');
             } else {
                 if (loaded) {
-                    main(socket);
+                    main();
                 } else {
-                    window.addEventListener('load', (socket) => { main(socket); });
+                    window.addEventListener('load', main);
                 }
             }
         });
