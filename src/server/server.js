@@ -22,6 +22,13 @@ app.use(function(err, req, res, next) {
     return res.status(500).send(path.join(__dirname, errorDir, '500.html'));
 });
 
+function main(socket) {
+    // all main application functionality, such as sending/receiving messages (put into other function)
+    socket.on('newMessage', (data) => {
+        console.log(data);
+    });
+}
+
 function register(socket, data) {
     database.createUser(data.username, data.displayname, data.email, data.password, (res) => {
         socket.emit('validRegistration', { 'res': res });
@@ -33,12 +40,12 @@ function login(socket, data) {
         socket.emit('validLogin', { 'res': res });
         if (res) {
             console.log('USER SUCCESSFULLY LOGGED IN');
-            // all main application functionality, such as sending/receiving messages (put into other function)
+            main(socket);
         }
     });
 }
 
-function main() {
+function start() {
     io.on('connection', (socket) => {
         // do key exchange
         var date = (new Date()).toString();
@@ -52,4 +59,4 @@ function main() {
     });
 }
 
-main();
+start();
