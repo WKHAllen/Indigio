@@ -11,7 +11,7 @@ function createWindow() {
         }
     });
     // win.removeMenu();
-    win.loadURL('http://localhost');
+    win.loadURL('http://localhost:3000');
     win.on('closed', () => {
         win = null
     });
