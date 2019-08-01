@@ -70,8 +70,7 @@ function register() {
     if (email === null) return;
     var password = getPassword();
     if (password === null) return;
-    var socket = io.connect(url);
-    // do key exchange
+    var socket = io.connect(url, { secure: true });
     socket.emit('register', { 'username': username, 'displayname': displayname, 'email': email, 'password': password });
     socket.on('validRegistration', (data) => {
         if (data.res) {

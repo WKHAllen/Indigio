@@ -16,7 +16,7 @@ function onEnter() {
 function sendMessage() {
     var mainInput = document.getElementById('main-input');
     socket.emit('newMessage', { 'text': mainInput.value, 'username': username, 'password': password });
-    mainInput.value = "";
+    mainInput.value = '';
 }
 
 function main() {
@@ -29,8 +29,7 @@ function start() {
     if (username === null || password === null) {
         window.location.replace('/login/');
     } else {
-        socket = io.connect(url);
-        // do key exchange
+        socket = io.connect(url, { secure: true });
         socket.emit('login', { 'username': username, 'password': password });
         socket.on('validLogin', (data) => {
             if (!data.res) {
