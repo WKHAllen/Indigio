@@ -7,6 +7,15 @@ var loaded = false;
 
 var socket;
 
+function loadSettings() {
+    var settings = JSON.parse(localStorage.getItem(localSettings));
+    if (settings === null) {
+        settings = defaultSettings;
+    }
+    document.documentElement.style.setProperty('--message-text-size', `${settings.textSize}pt`);
+    document.documentElement.style.setProperty('--message-img-height', `${settings.imageSize}px`);
+}
+
 function onEnter() {
     if (event.keyCode === 13) {
         sendMessage();
@@ -47,6 +56,7 @@ function start() {
 
 window.addEventListener('load', () => {
     loaded = true;
+    loadSettings();
 })
 
 start();

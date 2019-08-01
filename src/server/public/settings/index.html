@@ -10,7 +10,25 @@
     <body>
         <h1 class="centered-text">Settings</h1>
         <div class="middle-content">
-            <p>User settings will appear here.</p>
+            <div class="settings-option">
+                <label for="text-size">Message text size</label>
+                <input type="text" id="text-size" maxlength="2" onchange="updateTextSize();">
+            </div>
+            <div class="settings-option">
+                <label for="image-size">User image size</label>
+                <input type="text" id="image-size" maxlength="2" onchange="updateImageSize();">
+            </div>
+            <div class="settings-option" id="light-theme-option">
+                <label class="checkbox-container">
+                    Light theme
+                    <input type="checkbox" id="light-theme" onchange="updateLightTheme();">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+            <div class="last-buttons">
+                <button type="button" onclick="done();">Done</button>
+                <button type="button" onclick="reset();">Reset defaults</button>
+            </div>
         </div>
     </body>
 </html>
