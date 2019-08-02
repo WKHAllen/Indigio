@@ -3,6 +3,7 @@
     --std-padding: 8px;
     --std-border-radius: 4px;
     --std-outline: 0 0 0 2pt #8fafdf;
+    --std-scrollarea-height: 600px;
     --menu-list-height: 32px;
     --rooms-panel-width: 250px;
     --room-li-height: 50px;
@@ -32,6 +33,7 @@
     --message-user-color: #00afff;
     --message-timestamp-color: #9f9fcf;
     --message-text-size: 12pt;
+    --friend-button-width: 80px;
 }
 
 ::-webkit-scrollbar {
@@ -461,4 +463,76 @@ a:focus {
 
 .account-info tr td {
     padding-right: var(--std-padding);
+}
+
+.std-panel {
+    background-color: var(--menu-dark-color);
+    width: 100%;
+    max-height: var(--std-scrollarea-height);
+    overflow-y: scroll;
+}
+
+.std-panel ul {
+    list-style-type: none;
+    max-height: 100%;
+}
+
+.std-panel ul li {
+    height: var(--room-li-height);
+    line-height: var(--room-li-height);
+}
+
+.std-panel ul li img {
+    width: var(--room-li-img-height);
+    height: var(--room-li-img-height);
+    padding: calc((var(--room-li-height) - var(--room-li-img-height)) / 2);
+    float: left;
+}
+
+.std-panel ul li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    float: left;
+    font-size: 12pt;
+}
+
+.std-panel ul li::after {
+    clear: both;
+}
+
+.std-panel ul li button {
+    color: var(--secondary-color);
+    background-color: var(--menu-dark-color);
+    height: 100%;
+    width: var(--friend-button-width);
+    padding: 0 calc(var(--std-padding) * 1.4);
+    border-radius: 0;
+    outline: none;
+    float: right;
+}
+
+.std-panel ul li button:hover {
+    background-color: var(--menu-dark-hover);
+}
+
+.std-panel ul li button:active {
+    background-color: var(--menu-dark-active);
+}
+
+.std-panel ul li button:focus {
+    box-shadow: none;
+}
+
+#friends-list li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+}
+
+#friends-incoming li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
+}
+
+#friends-outgoing li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
 }

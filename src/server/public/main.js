@@ -30,8 +30,8 @@ function sendMessage() {
 
 function main() {
     document.getElementById('main-input').setAttribute('onkeydown', 'onEnter();');
-    // emit events for getting friends, rooms, messages, etc.
-    // set socket.on events for receiving new messages, adding/removing rooms, etc.
+    // TODO: emit events for getting rooms, messages, etc.
+    // TODO: set socket.on events for receiving new messages, adding/removing rooms, etc.
 }
 
 function start() {

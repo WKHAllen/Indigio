@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Indigio - Friends</title>
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../main.css">
+        <script type="text/javascript" src="../socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="../constants.js"></script>
+        <script type="text/javascript" src="friends.js"></script>
+    </head>
+    <body>
+        <h1 class="centered-text">Friends</h1>
+        <div class="middle-content">
+            <div class="settings-option">
+                <label for="add-friend">Add a friend <span class="smaller-text">(by username)</span></label>
+                <input type="text" id="add-friend" onkeydown="onEnterClick('add-friend-button');">
+                <button type="button" class="space-above" id="add-friend-button" onclick="addFriend();">Send friend request</button>
+            </div>
+            <div class="settings-option">
+                <label for="search-friends">Search your friends <span class="smaller-text">(by username or display name)</span></label>
+                <input type="text" id="search-friends" onkeydown="onEnterClick('search-friends-button');">
+                <button type="button" class="space-above" id="search-friends-button" onclick="searchFriends();">Search</button>
+            </div>
+            <h2 class="centered-text">Your friends</h2>
+            <div class="std-panel">
+                <ul id="friends-list">
+                </ul>
+            </div>
+            <h2 class="centered-text">Incoming friend requests</h2>
+            <div class="std-panel">
+                <ul id="friends-incoming">
+                </ul>
+            </div>
+            <h2 class="centered-text">Outgoing friend requests</h2>
+            <div class="std-panel">
+                <ul id="friends-outgoing">
+                </ul>
+            </div>
+            <button style="margin-top: calc(2 * var(--std-padding));" onclick="done();">Done</button>
+        </div>
+    </body>
+</html>

@@ -32,7 +32,8 @@ function setDisplayname(username, data) {
     database.setUserDisplayname(username, data.displayname);
 }
 
-function getImage(socket, username) {
+function getImage(socket, username, data) {
+    if (data) username = data.username;
     database.getUserImage(username, (image) => {
         socket.emit('returnImage', { 'image': image });
     });
@@ -46,16 +47,64 @@ function setPassword(username, data) {
     database.setUserPassword(username, data.password);
 }
 
+/* function getFriends(socket, username) {
+    database.getFriends(username, (friends) => {
+        socket.emit('returnFriends', { 'friends': friends });
+    });
+} */
+
+function getFriends(socket, username) {
+    database.getFriends(username, (data) => {
+        socket.emit('returnFriends', data);
+    });
+}
+
+function getIncomingFriendRequests(socket, username) {
+    database.getIncomingFriendRequests(username, (data) => {
+        socket.emit('returnIncomingFriendRequests', data);
+    });
+}
+
+function acceptIncomingFriendRequest(username, data) {
+    database.acceptIncomingFriendRequest(username, data.username);
+}
+
+function removeIncomingFriendRequest(username, data) {
+    database.removeIncomingFriendRequest(username, data.username);
+}
+
+function getOutgoingFriendRequests(socket, username) {
+    database.getOutgoingFriendRequests(username, (data) => {
+        socket.emit('returnOutgoingFriendRequests', data);
+    });
+}
+
+function newOutgoingFriendRequest(username, data) {
+    database.newOutgoingFriendRequest(username, data.username);
+}
+
+function removeOutgoingFriendRequest(username, data) {
+    database.removeOutgoingFriendRequest(username, data.username);
+}
+
 function main(socket, username) {
-    // all main application functionality, such as sending/receiving messages (put into other function)
+    // TODO: handle getting rooms, messages, etc.
     socket.on('newMessage', (data) => {
         console.log(data);
     });
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
-    socket.on('getImage', () => { getImage(socket, username); });
+    socket.on('getImage', (data) => { getImage(socket, username, data); });
     socket.on('setImage', (data) => { setImage(username, data); });
     socket.on('setPassword', (data) => { setPassword(username, data); });
+    socket.on('getFriends', () => { getFriends(socket, username); });
+    socket.on('getIncomingFriendRequests', () => { getIncomingFriendRequests(socket, username); });
+    socket.on('acceptIncomingFriendRequest', (data) => { acceptIncomingFriendRequest(username, data); });
+    socket.on('removeIncomingFriendRequest', (data) => { removeIncomingFriendRequest(username, data); });
+    socket.on('getOutgoingFriendRequests', () => { getOutgoingFriendRequests(socket, username); });
+    socket.on('newOutgoingFriendRequest', (data) => { newOutgoingFriendRequest(username, data); });
+    socket.on('removeOutgoingFriendRequest', (data) => { removeOutgoingFriendRequest(username, data); });
+    // TODO: implement friend searching
 }
 
 function register(socket, data) {

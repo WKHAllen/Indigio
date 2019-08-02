@@ -58,7 +58,14 @@ function init() {
             addTimestamp INT NOT NULL
         );
     `;
-    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable], (err, rows) => {
+    var friendRequestsTable = `
+        CREATE TABLE IF NOT EXISTS friendRequests (
+            id1 INT NOT NULL,
+            id2 INT NOT NULL,
+            requestTimestamp INT NOT NULL
+        );
+    `;
+    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable], (err, rows) => {
         if (err) throw err;
     });
 }
@@ -166,10 +173,73 @@ function removeFriend(username1, username2) {
     });
 }
 
-function getFriends(username, callback) {
+/* function getFriends(username, callback) {
     var sql = `SELECT username FROM users JOIN (SELECT id2 FROM friends WHERE id1 = (SELECT id FROM users WHERE username = ?)) userfriends ON users.id = userfriends.id2;`;
     var params = [username];
-    mainDB.execute(sql, params, callback);
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        var friends = [];
+        for (let i = 0; i < rows.length; i++)
+            friends.push(rows[i].username);
+        if (callback) callback(friends);
+    });
+} */
+
+function getFriends(username, callback) {
+    var sql = `SELECT username, displayname, imageURL FROM users JOIN (SELECT id2 FROM friends WHERE id1 = (SELECT id FROM users WHERE username = ?)) userFriends ON users.id = userFriends.id2;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
+    });
+}
+
+function getIncomingFriendRequests(username, callback) {
+    var sql = `SELECT username, displayname, imageURL FROM users JOIN (SELECT id1 FROM friendRequests WHERE id2 = (SELECT id FROM users WHERE username = ?)) userRequests ON users.id = userRequests.id1;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
+    });
+}
+
+function acceptIncomingFriendRequest(username1, username2) {
+    removeIncomingFriendRequest(username1, username2);
+    removeIncomingFriendRequest(username2, username1); // just in case
+    addFriend(username1, username2);
+}
+
+function removeIncomingFriendRequest(username1, username2) {
+    var sql = `DELETE FROM friendRequests WHERE id2 = (SELECT id FROM users WHERE username = ?) AND id1 = (SELECT id FROM users WHERE username = ?);`;
+    var params = [username1, username2];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
+function getOutgoingFriendRequests(username, callback) {
+    var sql = `SELECT username, displayname, imageURL FROM users JOIN (SELECT id2 FROM friendRequests WHERE id1 = (SELECT id FROM users WHERE username = ?)) userRequests ON users.id = userRequests.id2;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
+    });
+}
+
+function newOutgoingFriendRequest(username1, username2) {
+    var sql = `INSERT INTO friendRequests (id1, id2, requestTimestamp) VALUES ((SELECT id FROM users WHERE username = ?), (SELECT id FROM users WHERE username = ?), ?);`;
+    var params = [username1, username2, getTime()];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
+function removeOutgoingFriendRequest(username1, username2) {
+    var sql = `DELETE FROM friendRequests WHERE id1 = (SELECT id FROM users WHERE username = ?) AND id2 = (SELECT id FROM users WHERE username = ?);`;
+    var params = [username1, username2];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
 }
 
 function createRoom(roomType, name, callback) {
@@ -177,7 +247,7 @@ function createRoom(roomType, name, callback) {
     var params = [roomType, name, getTime()];
     var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
     mainDB.executeAfter(sql, params, (err, rows) => {
-        if (err) createRoom(roomType, name, callback);
+        if (err) throw err;
     }, sqlAfter, [], (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows[0].id);
@@ -262,9 +332,9 @@ function createMessage(text, username, roomID, callback) {
     var params = [text, username, roomID, getTime()];
     var sqlAfter = `SELECT id FROM messages ORDER BY id DESC LIMIT 1;`;
     mainDB.executeAfter(sql, params, (err, rows) => {
-        if (err) createMessage(text, username, roomID, callback);
+        if (err) throw err;
     }, sqlAfter, [], (err, rows) => {
-        if (err) createMessage(text, username, roomID, callback);
+        if (err) throw err;
         if (callback) callback(rows[0].id);
     });
 }
@@ -303,6 +373,12 @@ module.exports = {
     'addFriend': addFriend,
     'removeFriend': removeFriend,
     'getFriends': getFriends,
+    'getIncomingFriendRequests': getIncomingFriendRequests,
+    'acceptIncomingFriendRequest': acceptIncomingFriendRequest,
+    'removeIncomingFriendRequest': removeIncomingFriendRequest,
+    'getOutgoingFriendRequests': getOutgoingFriendRequests,
+    'newOutgoingFriendRequest': newOutgoingFriendRequest,
+    'removeOutgoingFriendRequest': removeOutgoingFriendRequest,
     'createRoom': createRoom,
     'deleteRoom': deleteRoom,
     'addToRoom': addToRoom,
