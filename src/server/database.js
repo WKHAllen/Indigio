@@ -13,30 +13,6 @@ function getTime() {
     return Math.floor(new Date().getTime() / 1000);
 }
 
-function openDB() {
-    return new sqlite3.Database(path.join(__dirname, dbFile));
-}
-
-function closeDB(db) {
-    db.close();
-}
-
-function execute(db, stmt, params, callback) {
-    db.all(stmt, params, (err, rows) => {
-        if (callback)
-            callback(err, rows);
-    });
-}
-
-function executeMany(stmts, callback) {
-    var db = openDB();
-    db.serialize(() => {
-        for (let stmt of stmts)
-            execute(db, stmt, [], callback);
-    });
-    closeDB(db);
-}
-
 function init() {
     var usersTable = `
         CREATE TABLE IF NOT EXISTS users (
@@ -82,7 +58,9 @@ function init() {
             addTimestamp INT NOT NULL
         );
     `;
-    executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable]);
+    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable], (err, rows) => {
+        if (err) throw err;
+    });
 }
 
 function createUser(username, displayname, email, password, callback) {
@@ -106,7 +84,7 @@ function createUser(username, displayname, email, password, callback) {
     });
 }
 
-function changePassword(username, newPassword) {
+function setUserPassword(username, newPassword) {
     bcrypt.hash(newPassword, saltRounds, (err, hash) => {
         var sql = `UPDATE users SET password = ? WHERE username = ?;`;
         var params = [hash, username];
@@ -116,10 +94,30 @@ function changePassword(username, newPassword) {
     });
 }
 
+function getUserDisplayname(username, callback) {
+    var sql = `SELECT displayname FROM users WHERE username = ?;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].displayname);
+    });
+}
+
 function setUserDisplayname(username, newDisplayname) {
     var sql = `UPDATE users SET displayname = ? WHERE username = ?;`;
     var params = [newDisplayname, username];
-    mainDB.execute(sql, params);
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
+function getUserImage(username, callback) {
+    var sql = `SELECT imageURL FROM users WHERE username = ?;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].imageURL);
+    });
 }
 
 function setUserImage(username, imageURL) {
@@ -297,8 +295,10 @@ function verifyLogin(username, password, callback) {
 
 module.exports = {
     'createUser': createUser,
-    'changePassword': changePassword,
+    'setUserPassword': setUserPassword,
+    'getUserDisplayname': getUserDisplayname,
     'setUserDisplayname': setUserDisplayname,
+    'getUserImage': getUserImage,
     'setUserImage': setUserImage,
     'addFriend': addFriend,
     'removeFriend': removeFriend,

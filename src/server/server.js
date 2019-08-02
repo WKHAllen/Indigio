@@ -22,11 +22,40 @@ app.use(function(err, req, res, next) {
     return res.status(500).send(path.join(__dirname, errorDir, '500.html'));
 });
 
-function main(socket) {
+function getDisplayname(socket, username) {
+    database.getUserDisplayname(username, (displayname) => {
+        socket.emit('returnDisplayname', { 'displayname': displayname });
+    });
+}
+
+function setDisplayname(username, data) {
+    database.setUserDisplayname(username, data.displayname);
+}
+
+function getImage(socket, username) {
+    database.getUserImage(username, (image) => {
+        socket.emit('returnImage', { 'image': image });
+    });
+}
+
+function setImage(username, data) {
+    database.setUserImage(username, data.image);
+}
+
+function setPassword(username, data) {
+    database.setUserPassword(username, data.password);
+}
+
+function main(socket, username) {
     // all main application functionality, such as sending/receiving messages (put into other function)
     socket.on('newMessage', (data) => {
         console.log(data);
     });
+    socket.on('getDisplayname', () => { getDisplayname(socket, username); });
+    socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
+    socket.on('getImage', () => { getImage(socket, username); });
+    socket.on('setImage', (data) => { setImage(username, data); });
+    socket.on('setPassword', (data) => { setPassword(username, data); });
 }
 
 function register(socket, data) {
@@ -40,14 +69,13 @@ function login(socket, data) {
         socket.emit('validLogin', { 'res': res });
         if (res) {
             console.log('USER SUCCESSFULLY LOGGED IN');
-            main(socket);
+            main(socket, data.username);
         }
     });
 }
 
 function start() {
     io.on('connection', (socket) => {
-        // do key exchange
         var date = (new Date()).toString();
         console.log(`[${date}] user joined`);
         socket.on('register', (data) => { register(socket, data); });

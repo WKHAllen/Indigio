@@ -16,7 +16,7 @@ function getUsername() {
     if (res !== null) {
         return username;
     } else {
-        showError('Error: username must be between 3 and 32 characters, and can only contain letters, numbers, and underscores.');
+        showError('Dsername must be between 3 and 32 characters, and can only contain letters, numbers, and underscores');
         return null;
     }
 }
@@ -27,7 +27,7 @@ function getDisplayname() {
     if (res !== null) {
         return displayname;
     } else {
-        showError('Error: display name must be between 3 and 32 characters, and can only contain letters, numbers, and underscores.');
+        showError('Display name must be between 3 and 32 characters, and can only contain letters, numbers, and underscores');
         return null;
     }
 }
@@ -38,7 +38,7 @@ function getEmail() {
     if (res !== null) {
         return email;
     } else {
-        showError('Error: email address is invalid.');
+        showError('Email address is invalid');
         return null;
     }
 }
@@ -51,11 +51,11 @@ function getPassword() {
         if (res !== null) {
             return password;
         } else {
-            showError('Error: password must be between 8 and 64 characters.');
+            showError('Password must be between 8 and 64 characters');
             return null;
         }
     } else {
-        showError('Error: passwords do not match');
+        showError('Passwords do not match');
         return null;
     }
 }
@@ -78,9 +78,10 @@ function register() {
             localStorage.setItem(localPassword, password);
             window.location.replace('..');
         } else {
-            showError('Error: username or email address is already in use.');
+            showError('Username or email address is already in use');
             document.getElementById('register-button').disabled = false;
         }
+        socket.disconnect();
     });
 }
 

@@ -1,5 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 
+const busyTimeout = 1000;
+
 class DB {
     constructor(filename) {
         this.filename = filename;
@@ -12,7 +14,7 @@ class DB {
         var currentServed = this.served;
         while (currentServed + currentQueueSize < this.served) {} // wait until at the front of the queue
         var db = new sqlite3.Database(this.filename);
-        db.configure('busyTimeout', 1);
+        db.configure('busyTimeout', busyTimeout);
         db.all(stmt, params, (err, rows) => {
             if (callback)
                 callback(err, rows);
@@ -27,6 +29,7 @@ class DB {
         var currentServed = this.served;
         while (currentServed + currentQueueSize < this.served) {} // wait until at the front of the queue
         var db = new sqlite3.Database(this.filename);
+        db.configure('busyTimeout', busyTimeout);
         db.serialize(() => {
             db.all(stmt, params, (err, rows) => {
                 if (callback)
@@ -36,6 +39,25 @@ class DB {
                 if (afterCallback)
                     afterCallback(err, rows);
             });
+        });
+        db.close();
+        this.queueSize--;
+        this.served++;
+    }
+
+    executeMany(stmts, callback) {
+        var currentQueueSize = this.queueSize++;
+        var currentServed = this.served;
+        while (currentServed + currentQueueSize < this.served) {} // wait until at the front of the queue
+        var db = new sqlite3.Database(this.filename);
+        db.configure('busyTimeout', busyTimeout);
+        db.serialize(() => {
+            for (let stmt of stmts) {
+                db.all(stmt, [], (err, rows) => {
+                    if (callback)
+                        callback(err, rows);
+                });
+            }
         });
         db.close();
         this.queueSize--;

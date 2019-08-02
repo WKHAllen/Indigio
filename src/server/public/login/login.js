@@ -42,6 +42,7 @@ function login() {
             showError('Error: login is invalid.');
             document.getElementById('login-button').disabled = false;
         }
+        socket.disconnect();
     });
 }
 

@@ -21,6 +21,7 @@
     --tertiary-text-hover: #5f7fef;
     --tertiary-text-active: #3f5fdf;
     --error-text-color: #cf0000;
+    --success-text-color: #00af3f;
     --menu-color: #1f3f8f;
     --menu-hover: #2f5faf;
     --menu-active: #3f7fcf;
@@ -374,7 +375,7 @@ a:focus {
     padding-bottom: var(--std-padding);
 }
 
-.last-buttons {
+.space-above {
     margin-top: var(--std-padding);
 }
 
@@ -448,4 +449,16 @@ a:focus {
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+.account-info {
+    margin-bottom: var(--std-padding);
+}
+
+.account-info tr {
+    height: 40px;
+}
+
+.account-info tr td {
+    padding-right: var(--std-padding);
 }
