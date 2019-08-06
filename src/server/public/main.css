@@ -525,8 +525,12 @@ a:focus {
     box-shadow: none;
 }
 
+#search-results-list li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
+}
+
 #friends-list li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
 }
 
 #friends-incoming li span {
@@ -535,4 +539,8 @@ a:focus {
 
 #friends-outgoing li span {
     width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+}
+
+.invisible {
+    display: none;
 }

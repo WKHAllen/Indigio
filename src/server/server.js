@@ -47,12 +47,6 @@ function setPassword(username, data) {
     database.setUserPassword(username, data.password);
 }
 
-/* function getFriends(socket, username) {
-    database.getFriends(username, (friends) => {
-        socket.emit('returnFriends', { 'friends': friends });
-    });
-} */
-
 function getFriends(socket, username) {
     database.getFriends(username, (data) => {
         socket.emit('returnFriends', data);
@@ -87,6 +81,28 @@ function removeOutgoingFriendRequest(username, data) {
     database.removeOutgoingFriendRequest(username, data.username);
 }
 
+function getDMRoomID(socket, username, data) {
+    database.getDMRoomID(username, data.username, (rooms) => {
+        if (rooms.length === 0) {
+            database.createRoom(database.dmRoomType, `${username}, ${data.username}`, (roomid) => {
+                database.addToRoom(roomid, username);
+                database.addToRoom(roomid, data.username);
+                socket.emit('returnDMRoomID', { 'roomid': roomid });
+            });
+        } else {
+            socket.emit('returnDMRoomID', { 'roomid': rooms[0].roomid });
+        }
+    });
+}
+
+function addFriend(username, data) {
+    database.newOutgoingFriendRequest(username, data.username);
+}
+
+function removeFriend(username, data) {
+    database.removeFriend(username, data.username);
+}
+
 function main(socket, username) {
     // TODO: handle getting rooms, messages, etc.
     socket.on('newMessage', (data) => {
@@ -104,7 +120,9 @@ function main(socket, username) {
     socket.on('getOutgoingFriendRequests', () => { getOutgoingFriendRequests(socket, username); });
     socket.on('newOutgoingFriendRequest', (data) => { newOutgoingFriendRequest(username, data); });
     socket.on('removeOutgoingFriendRequest', (data) => { removeOutgoingFriendRequest(username, data); });
-    // TODO: implement friend searching
+    socket.on('getDMRoomID', (data) => { getDMRoomID(socket, username, data); });
+    socket.on('addFriend', (data) => { addFriend(username, data); });
+    socket.on('removeFriend', (data) => { removeFriend(username, data); });
 }
 
 function register(socket, data) {
