@@ -8,6 +8,8 @@ const password = localStorage.getItem(localPassword);
 
 const defaultSettings = { 'textSize': 12, 'imageSize': 24 };
 
+const messageGroupSize = 30;
+
 const dmRoomType = 0;
 
 const url = window.location.host;

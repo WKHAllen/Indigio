@@ -2,6 +2,14 @@ var loaded = false;
 
 var socket;
 
+var roomID = parseInt(new URLSearchParams(window.location.search).get('roomid')) || null;
+if (roomID === null) {
+    roomID = localStorage.getItem(localOpenRoom);
+    if (roomID !== null) {
+        openRoom(roomID);
+    }
+}
+
 function loadSettings() {
     var settings = JSON.parse(localStorage.getItem(localSettings));
     if (settings === null) {
@@ -19,8 +27,15 @@ function onEnter() {
 
 function sendMessage() {
     var mainInput = document.getElementById('main-input');
-    socket.emit('newMessage', { 'text': mainInput.value, 'username': username, 'password': password });
+    socket.emit('newMessage', { 'text': mainInput.value, 'roomid': roomID });
     mainInput.value = '';
+}
+
+function validRoom(rooms) {
+    for (var room of rooms)
+        if (room.id === roomID)
+            return true;
+    return false;
 }
 
 function openRoom(roomid) {
@@ -32,6 +47,7 @@ function openRoom(roomid) {
 function addNewRoom(parentElement, roomData, socket) {
     var newRoom = document.createElement('li');
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
+    // Image
     var roomImage = document.createElement('img');
     if (roomData.roomType === dmRoomType) { // if room is a DM, show friend's image
         socket.emit('getDMImage', { 'roomid': roomData.id });
@@ -42,29 +58,81 @@ function addNewRoom(parentElement, roomData, socket) {
         roomImage.setAttribute('src', roomData.imageURL);
     }
     newRoom.appendChild(roomImage);
+    // Name
     var roomName = document.createElement('span');
     roomName.innerHTML = roomData.name;
     newRoom.appendChild(roomName);
     parentElement.appendChild(newRoom);
 }
 
+function addNewMessage(parentElement, messageData) {
+    var newMessage = document.createElement('div');
+    newMessage.classList.add('message');
+    // Image
+    messageImg = document.createElement('img');
+    messageImg.setAttribute('src', messageData.imageURL);
+    newMessage.appendChild(messageImg);
+    // Username
+    messageUsername = document.createElement('span');
+    messageUsername.classList.add('username');
+    messageUsername.innerHTML = messageData.username;
+    newMessage.appendChild(messageUsername);
+    // Timestamp
+    messageTimestamp = document.createElement('span');
+    messageTimestamp.classList.add('timestamp');
+    messageTimestamp.innerHTML = new Date(messageData.timestamp * 1000).toLocaleString();
+    newMessage.appendChild(messageTimestamp);
+    // Content
+    messageContent = document.createElement('span');
+    messageContent.classList.add('message-content');
+    messageContent.innerHTML = messageData.text;
+    newMessage.appendChild(messageContent);
+    parentElement.appendChild(newMessage);
+}
+
 function main() {
     document.getElementById('main-input').setAttribute('onkeydown', 'onEnter();');
-    // TODO: emit events for getting rooms, messages, etc.
-    // TODO: set socket.on events for receiving new messages, adding/removing rooms, etc.
+    // TODO: set socket.on events for adding/removing rooms, etc.
     socket.emit('getRooms');
     socket.on('returnRooms', (data) => {
         var roomList = document.getElementById('room-list');
-        if (data.length === 0)
+        var messageDiv = document.getElementById('messages');
+        if (data.length === 0) {
             roomList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
-        else
+            messageDiv.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+        } else {
             roomList.innerHTML = '';
+            if (roomID === null) {
+                openRoom(data[0].id);
+                return;
+            }
+        }
+        if (validRoom(data)) {
+            localStorage.setItem(localOpenRoom, roomID);
+        } else {
+            openRoom(localStorage.getItem(localOpenRoom));
+            return;
+        }
         for (var room of data) {
             addNewRoom(roomList, room, socket);
         }
-        // TODO: get messages
-        // if localStorage variable `localOpenRoom` is null, then get most recently updated room
-        // if no rooms exist, then show nothing
+        var messagesDiv = document.getElementById('messages');
+        messagesDiv.getElementsByClassName('loading')[0].classList.add('invisible');
+        socket.emit('getMessages', { 'roomid': roomID, 'size': messageGroupSize });
+        socket.on('returnMessages', (data) => {
+            for (var message of data) {
+                addNewMessage(messagesDiv, message, socket);
+            }
+            // TODO: scroll to bottom
+        });
+        socket.on('incomingMessage', (data) => {
+            if (data.roomid === roomID) {
+                addNewMessage(messagesDiv, data, socket);
+                // TODO: scroll down if possible and necessary
+            } else {
+                // TODO: move room on left panel to top and indicate that there is a new message
+            }
+        });
     });
 }
 

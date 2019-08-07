@@ -396,6 +396,7 @@ a:focus {
 }
 
 .message img {
+    float: left;
     width: var(--message-img-height);
     height: var(--message-img-height);
     padding: calc((var(--message-height) - var(--message-img-height)) / 2);
@@ -403,20 +404,23 @@ a:focus {
 
 .message .username {
     color: var(--message-user-color);
+    padding-left: calc(var(--std-padding) / 2);
+    padding-right: var(--std-padding);
 }
 
 .message .timestamp {
     color: var(--message-timestamp-color);
+    padding-right: var(--std-padding);
 }
 
 .message .message-content {
     color: var(--primary-text-color);
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
-.message img, .message p .username, .message p .timestamp, .message p .message-content {
-    padding-right: var(--std-padding);
+.message .username, .message .timestamp, .message .message-content {
     float: left;
-    display: table;
     white-space: normal;
 }
 
