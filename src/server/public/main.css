@@ -23,13 +23,13 @@
     --tertiary-text-active: #3f5fdf;
     --error-text-color: #cf0000;
     --success-text-color: #00af3f;
-    --menu-color: #1f3f8f;
-    --menu-hover: #2f5faf;
-    --menu-active: #3f7fcf;
+    --menu-color: #0f0faf;
+    --menu-hover: #1f2fbf;
+    --menu-active: #2f4fcf;
     --menu-dark-color: #2f0f8f;
     --menu-dark-hover: #3f1faf;
     --menu-dark-active: #4f2fcf;
-    --input-color: #2f4fbf;
+    --input-color: #1f2fbf;
     --message-user-color: #00afff;
     --message-timestamp-color: #9f9fcf;
     --message-text-size: 12pt;
@@ -41,7 +41,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background-color: rgba(127, 192, 255, 0.1);
+    background-color: rgba(127, 191, 255, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
