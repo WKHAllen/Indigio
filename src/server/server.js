@@ -106,6 +106,9 @@ function removeFriend(username, data) {
 function getRooms(socket, username) {
     database.getRooms(username, (data) => {
         socket.emit('returnRooms', data);
+        for (let room of data) {
+            socket.join(room.id.toString());
+        }
     });
 }
 
@@ -115,12 +118,31 @@ function getDMImage(socket, username, data) {
     });
 }
 
+function getMessages(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getMessages(data.roomid, data.size, (data) => {
+                socket.emit('returnMessages', data);
+            });
+        }
+    });
+}
+
+function newMessage(username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.createMessage(data.text, username, data.roomid);
+            var now = Math.floor(new Date().getTime() / 1000);
+            database.getUserImage(username, (image) => {
+                io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+            });
+        }
+    });
+}
+
 function main(socket, username) {
     // TODO: handle getting rooms, messages, etc.
     // TODO: join all necessary rooms
-    socket.on('newMessage', (data) => {
-        console.log(data);
-    });
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
     socket.on('getImage', (data) => { getImage(socket, username, data); });
@@ -138,6 +160,8 @@ function main(socket, username) {
     socket.on('removeFriend', (data) => { removeFriend(username, data); });
     socket.on('getRooms', () => { getRooms(socket, username); });
     socket.on('getDMImage', (data) => { getDMImage(socket, username, data); });
+    socket.on('getMessages', (data) => { getMessages(socket, username, data); });
+    socket.on('newMessage', (data) => { newMessage(username, data); });
 }
 
 function register(socket, data) {

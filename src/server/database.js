@@ -439,6 +439,18 @@ function getUsersInRoom(roomID, callback) {
     });
 }
 
+function userInRoom(username, roomID, callback) {
+    var sql = `
+        SELECT userid, roomid FROM roomUsers WHERE userid = (
+            SELECT id FROM users WHERE username = ?
+        ) AND roomid = ?;`;
+    var params = [username, roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
+    });
+}
+
 function getDMImage(username, roomID, callback) {
     var sql = `
         SELECT imageURL FROM users WHERE id = (
@@ -450,6 +462,18 @@ function getDMImage(username, roomID, callback) {
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows[0]);
+    });
+}
+
+function getMessages(roomID, size, callback) {
+    var sql = `
+        SELECT text, username, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+            SELECT text, userid, roomid, createTimestamp FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
+        ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp ASC;`;
+    var params = [roomID, size];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
     });
 }
 
@@ -527,7 +551,9 @@ module.exports = {
     'setRoomImage': setRoomImage,
     'getRooms': getRooms,
     'getUsersInRoom': getUsersInRoom,
+    'userInRoom': userInRoom,
     'getDMImage': getDMImage,
+    'getMessages': getMessages,
     'createMessage': createMessage,
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType
