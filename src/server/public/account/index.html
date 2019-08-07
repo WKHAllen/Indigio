@@ -5,48 +5,63 @@
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
         <script type="text/javascript" src="../socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="../constants.js"></script>
+        <script type="text/javascript" src="../utils.js"></script>
         <script type="text/javascript" src="account.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">Account</h1>
-        <div class="middle-content">
-            <table class="account-info">
-                <tr>
-                    <td>Username: </td>
-                    <td id="username-label"></td>
-                </tr>
-                <tr>
-                    <td>Display name: </td>
-                    <td id="displayname-label"></td>
-                </tr>
-                <tr>
-                    <td>Image: </td>
-                    <td id="image-label"></td>
-                </tr>
-            </table>
-            <div class="settings-option">
-                <label for="displayname">Change display name</label>
-                <input type="text" id="displayname" maxlength="32" onkeydown="onEnterClick('displayname-button');">
-                <button type="button" id="displayname-button" class="space-above" onclick="setDisplayname();">Set name</button>
-                <span id="displayname-status"></span>
-            </div>
-            <div class="settings-option">
-                <label for="image">Change image URL</label>
-                <input type="text" id="image" onkeydown="onEnterClick('image-button');">
-                <button type="button" id="image-button" class="space-above" onclick="setImage();">Set image</button>
-                <span id="image-status"></span>
-            </div>
-            <div class="settings-option">
-                <label for="password">Change password</label>
-                <input type="password" id="password" onkeydown="onEnterClick('password-button');">
-                <label for="password-confirm">Confirm password</label>
-                <input type="password" id="password-confirm" onkeydown="onEnterClick('password-button');">
-                <button type="button" id="password-button" class="space-above" onclick="setPassword();">Set password</button>
-                <span id="password-status"></span>
-            </div>
-            <div class="space-above">
-                <button type="button" onclick="done();">Done</button>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Account</h1>
+            <div class="middle-content">
+                <table class="account-info">
+                    <tr>
+                        <td>Username: </td>
+                        <td id="username-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Display name: </td>
+                        <td id="displayname-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Image: </td>
+                        <td id="image-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                </table>
+                <div class="settings-option">
+                    <label for="displayname">Change display name</label>
+                    <input type="text" id="displayname" maxlength="32" onkeydown="onEnterClick('displayname-button');">
+                    <button type="button" id="displayname-button" class="space-above" onclick="setDisplayname();">Set name</button>
+                    <span id="displayname-status"></span>
+                </div>
+                <div class="settings-option">
+                    <label for="image">Change image URL</label>
+                    <input type="text" id="image" onkeydown="onEnterClick('image-button');">
+                    <button type="button" id="image-button" class="space-above" onclick="setImage();">Set image</button>
+                    <span id="image-status"></span>
+                </div>
+                <div class="settings-option">
+                    <label for="password">Change password</label>
+                    <input type="password" id="password" onkeydown="onEnterClick('password-button');">
+                    <label for="password-confirm">Confirm password</label>
+                    <input type="password" id="password-confirm" onkeydown="onEnterClick('password-button');">
+                    <button type="button" id="password-button" class="space-above" onclick="setPassword();">Set password</button>
+                    <span id="password-status"></span>
+                </div>
             </div>
         </div>
     </body>

@@ -4,7 +4,7 @@
     --std-border-radius: 4px;
     --std-outline: 0 0 0 2pt #8fafdf;
     --std-scrollarea-height: 600px;
-    --menu-list-height: 32px;
+    --menu-bar-height: 40px;
     --rooms-panel-width: 250px;
     --room-li-height: 50px;
     --room-li-img-height: 32px;
@@ -218,25 +218,42 @@ a:focus {
     height: 100%;
 }
 
-#menu-list {
-    list-style-type: none;
-    margin: 0;
+.main-div {
+    padding: calc(2 * var(--std-padding));
+    height: calc(100% - var(--menu-bar-height) - 4 * var(--std-padding));
+    overflow-y: scroll;
+}
+
+#menu-bar {
+    -webkit-app-region: drag;
+    position: relative;
     background-color: var(--menu-color);
-    height: var(--menu-list-height);
+    height: var(--menu-bar-height);
+}
+
+#menu-list {
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 0;
+    left: 0;
+    list-style-type: none;
+    background-color: var(--menu-color);
+    height: 100%;
 }
 
 #menu-list li {
     display: inline-block;
-    height: var(--menu-list-height);
+    height: 100%;
 }
 
 #menu-list li a button {
     color: var(--secondary-color);
     background-color: var(--menu-color);
-    height: var(--menu-list-height);
-    padding: 0 calc(var(--std-padding) * 1.4);
+    height: 100%;
+    padding: 0 calc(var(--std-padding) * 1.2);
     border-radius: 0;
     outline: none;
+    font-size: 10pt;
 }
 
 #menu-list li a button:hover {
@@ -251,9 +268,52 @@ a:focus {
     box-shadow: none;
 }
 
+.title {
+    text-align: center;
+    line-height: var(--menu-bar-height);
+    padding: 0;
+}
+
+#window-menu {
+    -webkit-app-region: no-drag;
+    position: absolute;
+    top: 0;
+    right: 0;
+    list-style-type: none;
+    background-color: var(--menu-color);
+    height: 100%;
+}
+
+#window-menu li {
+    display: inline-block;
+    width: var(--menu-bar-height);
+    height: 100%;
+}
+
+#window-menu li button {
+    color: var(--secondary-color);
+    background-color: var(--menu-color);
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    outline: none;
+}
+
+#window-menu li button:hover {
+    background-color: var(--menu-hover);
+}
+
+#window-menu li button:active {
+    background-color: var(--menu-active);
+}
+
+#window-menu li button:focus {
+    box-shadow: none;
+}
+
 .main-screen {
     width: 100%;
-    height: calc(100vh - var(--menu-list-height));
+    height: calc(100vh - var(--menu-bar-height));
 }
 
 .main-screen::after {
@@ -272,7 +332,7 @@ a:focus {
 }
 
 #room-list {
-    width: var(--rooms-panel-width);
+    width: 100%;
     height: 100%;
     list-style-type: none;
     overflow-y: scroll;
@@ -295,7 +355,7 @@ a:focus {
 }
 
 #room-list li span {
-    width: calc(var(--rooms-panel-width) - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -318,7 +378,7 @@ a:focus {
 #current-room {
     float: left;
     width: calc(100% - var(--rooms-panel-width));
-    height: calc(100vh - var(--menu-list-height));
+    height: calc(100vh - var(--menu-bar-height));
 }
 
 #messages {
@@ -543,4 +603,13 @@ a:focus {
 
 .invisible {
     display: none;
+}
+
+.centered-div {
+    margin: auto;
+    text-align: center;
+}
+
+.loading {
+    color: var(--message-timestamp-color);
 }

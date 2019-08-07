@@ -5,19 +5,38 @@
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
         <script type="text/javascript" src="../socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="../constants.js"></script>
+        <script type="text/javascript" src="../utils.js"></script>
         <script type="text/javascript" src="login.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">Login</h1>
-        <div class="middle-content">
-            <label class="form-label" for="username">Username</label>
-            <input class="form-input" type="text" id="username" maxlength="64" onkeydown="onEnter();">
-            <label class="form-label" for="password">Password</label>
-            <input class="form-input" type="password" id="password" minlength="8" maxlength="64" onkeydown="onEnter();">
-            <button class="form-button" type="button" onclick="login();" id="login-button">Login</button>
-            <p class="invisible" id="error-text"></p>
-            <p>Don't have an account? <a href="/register/">Create one here</a>.</p>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Login</h1>
+            <div class="middle-content">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-input" type="text" id="username" maxlength="64" onkeydown="onEnter();">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-input" type="password" id="password" minlength="8" maxlength="64" onkeydown="onEnter();">
+                <button class="form-button" type="button" onclick="login();" id="login-button">Login</button>
+                <p class="invisible" id="error-text"></p>
+                <p>Don't have an account? <a href="/register/">Create one here</a>.</p>
+                <p>Don't have the app downloaded?<a href="../downloads/">Download it here</a>.</p>
+            </div>
         </div>
     </body>
 </html>

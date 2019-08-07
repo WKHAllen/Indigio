@@ -103,8 +103,21 @@ function removeFriend(username, data) {
     database.removeFriend(username, data.username);
 }
 
+function getRooms(socket, username) {
+    database.getRooms(username, (data) => {
+        socket.emit('returnRooms', data);
+    });
+}
+
+function getDMImage(socket, username, data) {
+    database.getDMImage(username, data.roomid, (data) => {
+        socket.emit('returnDMImage', data);
+    });
+}
+
 function main(socket, username) {
     // TODO: handle getting rooms, messages, etc.
+    // TODO: join all necessary rooms
     socket.on('newMessage', (data) => {
         console.log(data);
     });
@@ -123,6 +136,8 @@ function main(socket, username) {
     socket.on('getDMRoomID', (data) => { getDMRoomID(socket, username, data); });
     socket.on('addFriend', (data) => { addFriend(username, data); });
     socket.on('removeFriend', (data) => { removeFriend(username, data); });
+    socket.on('getRooms', () => { getRooms(socket, username); });
+    socket.on('getDMImage', (data) => { getDMImage(socket, username, data); });
 }
 
 function register(socket, data) {

@@ -1,13 +1,7 @@
-const url = window.location.host;
-
 function showError(msg) {
     var errorText = document.getElementById('error-text');
     errorText.innerHTML = msg;
     errorText.classList.remove('invisible');
-}
-
-function stripWhitespace(str) {
-    return str.replace(/^\s+|\s+$/g, '');
 }
 
 function getUsername() {

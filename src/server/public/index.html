@@ -6,36 +6,37 @@
         <link rel="stylesheet" type="text/css" href="main.css">
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript" src="constants.js"></script>
+        <script type="text/javascript" src="utils.js"></script>
         <script type="text/javascript" src="main.js"></script>
     </head>
     <body class="main">
-        <div class="menu-bar">
+        <div id="menu-bar">
             <ul id="menu-list">
-                <li><a href="/settings/"><button>Settings</button></a></li><!--
-                --><li><a href="/account/"><button>Account</button></a></li><!--
-                --><li><a href="/friends/"><button>Friends</button></a></li><!--
-                --><li><a href="/logout/"><button>Logout</button></a></li>
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
             </ul>
         </div>
         <div class="main-screen">
             <div id="rooms-panel">
                 <ul id="room-list">
-                    <!-- list of rooms -->
-                    <li id="insert-room-id-here-1" onclick="console.log('you clicked 1');">
-                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 1</span>
-                    </li>
-                    <li id="insert-room-id-here-2" onclick="console.log('you clicked 2');">
-                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 2</span>
-                    </li>
-                    <li id="insert-room-id-here-3" onclick="console.log('you clicked 3');">
-                        <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico"><span>Room 3</span>
-                    </li>
+                    <div class="centered-div" style="margin-top: var(--std-padding);"><span class="loading">Loading...</span></div>
                 </ul>
             </div>
             <div id="current-room">
                 <div id="messages">
+                    <div class="centered-div"><span class="loading">Loading...</span></div>
                     <!-- messages in the currently selected room -->
-                    <div class="message" id="insert-message-id-here-1">
+                    <!-- <div class="message" id="insert-message-id-here-1">
                         <img src="https://raw.githubusercontent.com/WKHAllen/Txtr/master/txtr/icon.ico">
                         <span class="username">User 1</span>
                         <span class="timestamp">Timestamp 1</span>
@@ -52,7 +53,7 @@
                         <span class="username">User 3</span>
                         <span class="timestamp">Timestamp 3</span>
                         <span class="message-content">Message 3</span>
-                    </div>
+                    </div> -->
                 </div>
                 <div id="input">
                     <input type="text" id="main-input" maxlength="2000">

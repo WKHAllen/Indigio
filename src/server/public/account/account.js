@@ -1,18 +1,3 @@
-const url = window.location.host;
-
-var username = localStorage.getItem(localUsername);
-var password = localStorage.getItem(localPassword);
-
-function stripWhitespace(str) {
-    return str.replace(/^\s+|\s+$/g, '');
-}
-
-function onEnterClick(buttonID) {
-    if (event.keyCode === 13) {
-        document.getElementById(buttonID).click();
-    }
-}
-
 function setDisplayname() {
     document.getElementById('displayname-button').disabled = true;
     var displayname = stripWhitespace(document.getElementById('displayname').value);
@@ -95,10 +80,6 @@ function setPassword() {
     });
 }
 
-function done() {
-    window.location.replace('..');
-}
-
 function populateOptions() {
     document.getElementById('username-label').innerHTML = username;
     var socket = io.connect(url, { secure: true });
@@ -120,8 +101,12 @@ function populateOptions() {
             });
         } else {
             socket.disconnect();
+            window.location.replace('../login/');
         }
     });
 }
 
 window.addEventListener('load', populateOptions);
+
+if (username === null || password === null)
+    window.location.replace('../login/');

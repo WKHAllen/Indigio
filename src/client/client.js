@@ -1,19 +1,33 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, globalShortcut } = require('electron');
 
 var win;
 
+function toggleKiosk() {
+    win.setKiosk(!win.isKiosk());
+}
+
 function createWindow() {
     win = new BrowserWindow({
-        width: 800,
+        width: 1000,
         height: 600,
+        center: true,
+        frame: false,
+        title: 'Indigio',
+        // icon
+        backgroundColor: '#001f4f',
+        darkTheme: true,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            devTools: false
         }
     });
-    // win.removeMenu();
+    win.removeMenu();
     win.loadURL('http://localhost:3000');
     win.on('closed', () => {
         win = null
+    });
+    globalShortcut.register('CommandOrControl+Shift+F', () => {
+        toggleKiosk();
     });
 }
 

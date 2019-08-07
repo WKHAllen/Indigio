@@ -24,10 +24,6 @@ function updateLightTheme() {
     document.getElementById('light-theme-option').innerHTML = 'No';
 }
 
-function done() {
-    window.location.replace('..');
-}
-
 function reset() {
     settings = defaultSettings;
     localStorage.setItem(localSettings, JSON.stringify(settings));

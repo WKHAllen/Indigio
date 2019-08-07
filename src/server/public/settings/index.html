@@ -4,30 +4,47 @@
         <title>Indigio - Settings</title>
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
-        <script type="text/javascript" src="../constants.js"></script>
+        <script type="text/javascript" src="../utils.js"></script>
         <script type="text/javascript" src="settings.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">Settings</h1>
-        <div class="middle-content">
-            <div class="settings-option">
-                <label for="text-size">Message text size</label>
-                <input type="text" id="text-size" maxlength="2" onchange="updateTextSize();">
-            </div>
-            <div class="settings-option">
-                <label for="image-size">User image size</label>
-                <input type="text" id="image-size" maxlength="2" onchange="updateImageSize();">
-            </div>
-            <div class="settings-option" id="light-theme-option">
-                <label class="checkbox-container">
-                    Light theme
-                    <input type="checkbox" id="light-theme" onchange="updateLightTheme();">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-            <div class="space-above">
-                <button type="button" onclick="done();">Done</button>
-                <button type="button" onclick="reset();">Reset defaults</button>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Settings</h1>
+            <div class="middle-content">
+                <div class="settings-option">
+                    <label for="text-size">Message text size</label>
+                    <input type="text" id="text-size" maxlength="2" onchange="updateTextSize();">
+                </div>
+                <div class="settings-option">
+                    <label for="image-size">User image size</label>
+                    <input type="text" id="image-size" maxlength="2" onchange="updateImageSize();">
+                </div>
+                <div class="settings-option" id="light-theme-option">
+                    <label class="checkbox-container">
+                        Light theme
+                        <input type="checkbox" id="light-theme" onchange="updateLightTheme();">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="space-above">
+                    <button type="button" onclick="reset();">Reset defaults</button>
+                </div>
             </div>
         </div>
     </body>

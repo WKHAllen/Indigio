@@ -4,10 +4,29 @@
         <title>Error 500</title>
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
+        <script type="text/javascript" src="../utils.js"></script>
     </head>
-    <body>
-        <div class="middle-content">
-            <p class="centered-text padded">Internal server error. Please contact an administrator.</p>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <div class="middle-content">
+                <p class="centered-text padded">Internal server error. Please contact an administrator.</p>
+            </div>
         </div>
     </body>
 </html>

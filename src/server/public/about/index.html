@@ -4,19 +4,38 @@
         <title>Indigio - About</title>
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
+        <script type="text/javascript" src="../utils.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">About Indigio</h1>
-        <div class="middle-content">
-            <p>Indigio is an open source chatting app, and it's available on the web and as a desktop application. See the links below. If you haven't yet created an account, <a href="../register/">click here to do so</a>.</p>
-            <h2>In browser</h2>
-            <p><a href="..">Click here to go to the app in your browser</a>.</p>
-            <h2>As a desktop app</h2>
-            <p><a href="../downloads/">Click here to go to the downloads page</a>.</p>
-            <h2>Contributing</h2>
-            <p>If you would like to contribute to Indigio, feel free to visit <a href="https://github.com/WKHAllen/Indigio" target="_blank">the github repository</a>.</p>
-            <h2>Security concerns</h2>
-            <p>At the moment, the application is not as secure as it should be. It is not recommended that it be used for secure communication. In the future these security issues will be fixed.</p>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">About Indigio</h1>
+            <div class="middle-content">
+                <p>Indigio is an open source chatting app, and it's available on the web and as a desktop application. See the links below. If you haven't yet created an account, <a href="../register/">click here to do so</a>.</p>
+                <h2>In browser</h2>
+                <p><a href="..">Click here to go to the app in your browser</a>.</p>
+                <h2>As a desktop app</h2>
+                <p><a href="../downloads/">Click here to go to the downloads page</a>.</p>
+                <h2>Contributing</h2>
+                <p>If you would like to contribute to Indigio, feel free to visit <a href="https://github.com/WKHAllen/Indigio" target="_blank">the github repository</a>.</p>
+                <h2>Security concerns</h2>
+                <p>At the moment, the application is not as secure as it should be. It is not recommended that it be used for secure communication. In the future these security issues will be fixed.</p>
+            </div>
         </div>
     </body>
 </html>

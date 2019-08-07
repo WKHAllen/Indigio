@@ -4,11 +4,30 @@
         <title>Indigio - Downloads</title>
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
+        <script type="text/javascript" src="../utils.js"></script>
     </head>
-    <body>
-        <h1 class="centered-text">Downloads</h1>
-        <div class="middle-content">
-            <p>Download links will appear here once release versions have been created. If you'd like to speed up the development process, feel free to contribute by visiting the <a href="https://github.com/WKHAllen/Indigio" target="_blank">Indigio repository</a>.</p>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Downloads</h1>
+            <div class="middle-content">
+                <p>Download links will appear here once release versions have been created. If you'd like to speed up the development process, feel free to contribute by visiting the <a href="https://github.com/WKHAllen/Indigio" target="_blank">Indigio repository</a>.</p>
+            </div>
         </div>
     </body>
 </html>

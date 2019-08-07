@@ -1,4 +1,3 @@
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const bcrypt = require('bcrypt');
 const db = require('./db.js');
@@ -30,10 +29,12 @@ function init() {
     var roomsTable = `
         CREATE TABLE IF NOT EXISTS rooms (
             id INTEGER PRIMARY KEY,
+            creatorid INTEGER NULL,
             roomType INT NOT NULL,
             name TEXT,
             imageURL TEXT,
-            createTimestamp INT NOT NULL
+            createTimestamp INT NOT NULL,
+            updateTimestamp INT NOT NULL
         );
     `;
     var roomUsersTable = `
@@ -326,13 +327,15 @@ function getDMRoomID(username1, username2, callback) {
 function createRoom(roomType, name, callback) {
     var sql = `
         INSERT INTO rooms (
-            roomType, name, createTimestamp
+            roomType, name, createTimestamp, updateTimestamp
         ) VALUES (
             ?, 
             ?, 
+            ?,
             ?
         );`;
-    var params = [roomType, name, getTime()];
+    var now = getTime();
+    var params = [roomType, name, now, now];
     var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
     mainDB.executeAfter(sql, params, (err, rows) => {
         if (err) throw err;
@@ -412,9 +415,11 @@ function setRoomImage(roomID, imageURL) {
 
 function getRooms(username, callback) {
     var sql = `
-        SELECT roomid FROM roomUsers WHERE userid = (
-            SELECT id FROM users WHERE username = ?
-        );`;
+        SELECT id, roomType, name, imageURL FROM rooms JOIN (
+            SELECT roomid FROM roomUsers WHERE userid = (
+                SELECT id FROM users WHERE username = ?
+            )
+        ) userRooms ON rooms.id = userRooms.roomid ORDER BY updateTimestamp DESC;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
@@ -431,6 +436,20 @@ function getUsersInRoom(roomID, callback) {
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows);
+    });
+}
+
+function getDMImage(username, roomID, callback) {
+    var sql = `
+        SELECT imageURL FROM users WHERE id = (
+            SELECT userid FROM roomUsers WHERE userid != (
+                SELECT id FROM users WHERE username = ?
+            ) AND roomid = ?
+        );`;
+    var params = [username, roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0]);
     });
 }
 
@@ -451,6 +470,11 @@ function createMessage(text, username, roomID, callback) {
     }, sqlAfter, [], (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows[0].id);
+    });
+    sql = `UPDATE rooms SET updateTimestamp = ? WHERE id = ?`;
+    params = [getTime(), roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
     });
 }
 
@@ -503,6 +527,7 @@ module.exports = {
     'setRoomImage': setRoomImage,
     'getRooms': getRooms,
     'getUsersInRoom': getUsersInRoom,
+    'getDMImage': getDMImage,
     'createMessage': createMessage,
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType
