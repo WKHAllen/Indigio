@@ -414,13 +414,30 @@ function setRoomImage(roomID, imageURL) {
 }
 
 function getRooms(username, callback) {
+    // Let's not talk about this
     var sql = `
-        SELECT id, roomType, name, imageURL FROM rooms JOIN (
-            SELECT roomid FROM roomUsers WHERE userid = (
-                SELECT id FROM users WHERE username = ?
-            )
-        ) userRooms ON rooms.id = userRooms.roomid ORDER BY updateTimestamp DESC;`;
-    var params = [username];
+        SELECT * FROM (
+            SELECT rooms1.id, roomType, updateTimestamp, name, imageURL FROM (
+                SELECT id, roomType, updateTimestamp, name, imageURL FROM rooms WHERE roomType != ?
+            ) rooms1 JOIN (
+                SELECT roomid FROM roomUsers WHERE userid = (
+                    SELECT id FROM users WHERE username = ?
+                )
+            ) roomUsers1 ON rooms1.id = roomUsers1.roomid
+            UNION
+            SELECT rooms2.id, roomType, updateTimestamp, name, imageURL FROM (
+                SELECT id, roomType, updateTimestamp FROM rooms WHERE roomType = ?
+            ) rooms2 JOIN (
+                SELECT roomid, userid FROM roomUsers WHERE userid = (
+                    SELECT id FROM users WHERE username = ?
+                )
+            ) roomUsers2 ON rooms2.id = roomUsers2.roomid JOIN (
+                SELECT displayname name, imageURL, roomid FROM (
+                    SELECT * FROM users WHERE username != ?
+                ) users1 JOIN roomUsers ON users1.id = userid
+            ) users2 ON users2.roomid = rooms2.id
+        ) ORDER BY updateTimestamp DESC;`;
+    var params = [dmRoomType, username, dmRoomType, username, username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows);

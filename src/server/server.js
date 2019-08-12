@@ -141,8 +141,6 @@ function newMessage(username, data) {
 }
 
 function main(socket, username) {
-    // TODO: handle getting rooms, messages, etc.
-    // TODO: join all necessary rooms
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
     socket.on('getImage', (data) => { getImage(socket, username, data); });
