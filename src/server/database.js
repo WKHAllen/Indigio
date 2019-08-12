@@ -261,12 +261,18 @@ function newOutgoingFriendRequest(username1, username2) {
             if (err) throw err;
             if (rows.length > 0) {
                 sql = `
-                    SELECT * FROM friendRequests WHERE id1 = (
+                    SELECT id2 FROM friendRequests WHERE id1 = (
+                        SELECT id FROM users WHERE username = ?
+                    ) AND id2 = (
+                        SELECT id FROM users WHERE username = ?
+                    )
+                    UNION
+                    SELECT id2 FROM friends WHERE id1 = (
                         SELECT id FROM users WHERE username = ?
                     ) AND id2 = (
                         SELECT id FROM users WHERE username = ?
                     );`;
-                params = [username1, username2];
+                params = [username1, username2, username1, username2];
                 mainDB.execute(sql, params, (err, rows) => {
                     if (err) throw err;
                     if (rows.length === 0) {
