@@ -49,14 +49,7 @@ function addNewRoom(parentElement, roomData, socket) {
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
     // Image
     var roomImage = document.createElement('img');
-    if (roomData.roomType === dmRoomType) { // if room is a DM, show friend's image
-        socket.emit('getDMImage', { 'roomid': roomData.id });
-        socket.on('returnDMImage', (data) => {
-            roomImage.setAttribute('src', data.imageURL);
-        });
-    } else {
-        roomImage.setAttribute('src', roomData.imageURL);
-    }
+    roomImage.setAttribute('src', roomData.imageURL);
     newRoom.appendChild(roomImage);
     // Name
     var roomName = document.createElement('span');
@@ -106,12 +99,13 @@ function main() {
                 openRoom(data[0].id);
                 return;
             }
-        }
-        if (validRoom(data)) {
-            localStorage.setItem(localOpenRoom, roomID);
-        } else {
-            openRoom(localStorage.getItem(localOpenRoom));
-            return;
+            if (validRoom(data)) {
+                localStorage.setItem(localOpenRoom, roomID);
+            } else {
+                localStorage.removeItem(localOpenRoom);
+                window.location.replace('/');
+                return;
+            }
         }
         for (var room of data) {
             addNewRoom(roomList, room, socket);
