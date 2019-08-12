@@ -117,12 +117,16 @@ function main() {
             for (var message of data) {
                 addNewMessage(messagesDiv, message, socket);
             }
-            // TODO: scroll to bottom
+            messagesDiv.scrollTo(0, messagesDiv.scrollHeight);
         });
         socket.on('incomingMessage', (data) => {
             if (data.roomid === roomID) {
-                addNewMessage(messagesDiv, data, socket);
-                // TODO: scroll down if possible and necessary
+                if (username === data.username || messagesDiv.scrollTop >= messagesDiv.scrollHeight - messagesDiv.clientHeight) {
+                    addNewMessage(messagesDiv, data, socket);
+                    messagesDiv.scrollTo(0, messagesDiv.scrollHeight);
+                } else {
+                    addNewMessage(messagesDiv, data, socket);
+                }
             } else {
                 // TODO: move room on left panel to top and indicate that there is a new message
             }
