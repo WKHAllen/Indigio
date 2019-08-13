@@ -1,11 +1,13 @@
 const path = require('path');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const db = require('./db.js');
 
 const dbDir = 'db';
 const dbFile = path.join(dbDir, 'main.db');
 const saltRounds = 14;
 const dmRoomType = 0;
+const hexLength = 64;
 
 var mainDB = new db.DB(path.join(__dirname, dbFile));
 
@@ -67,7 +69,15 @@ function init() {
             requestTimestamp INT NOT NULL
         );
     `;
-    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable], (err, rows) => {
+    var passwordResetTable = `
+        CREATE TABLE IF NOT EXISTS passwordReset (
+            id INTEGER PRIMARY KEY,
+            email TEXT NOT NULL,
+            resetid TEXT NOT NULL,
+            createTimestamp INT NOT NULL
+        );
+    `;
+    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable], (err, rows) => {
         if (err) throw err;
     });
 }
@@ -420,7 +430,6 @@ function setRoomImage(roomID, imageURL) {
 }
 
 function getRooms(username, callback) {
-    // Let's not talk about this
     var sql = `
         SELECT * FROM (
             SELECT rooms1.id, roomType, updateTimestamp, name, imageURL FROM (
@@ -525,6 +534,64 @@ function createMessage(text, username, roomID, callback) {
     });
 }
 
+function emailExists(email, callback) {
+    var sql = `SELECT email FROM users WHERE email = ?`;
+    var params = [email];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
+    });
+}
+
+function newPasswordResetID(email, callback) {
+    crypto.randomBytes(hexLength / 2, (err, buffer) => {
+        if (err) throw err;
+        var resetID = buffer.toString('hex');
+        var sql = `SELECT resetid FROM passwordReset WHERE resetid = ?`;
+        var params = [resetID];
+        mainDB.execute(sql, params, (err, rows) => {
+            if (err) throw err;
+            if (rows.length > 0) {
+                newPasswordResetID(email, callback);
+            } else {
+                sql = `INSERT INTO passwordReset (email, resetid, createTimestamp) VALUES (?, ?, ?)`;
+                params = [email, resetID, getTime()];
+                var sqlAfter = `SELECT resetid FROM passwordReset ORDER BY id DESC LIMIT 1`;
+                mainDB.executeAfter(sql, params, (err, rows) => {
+                    if (err) throw err;
+                }, sqlAfter, [], (err, rows) => {
+                    if (err) throw err;
+                    if (callback) callback(rows[0].resetid);
+                });
+            }
+        });
+    });
+}
+
+function checkPasswordResetID(passwordResetID, callback) {
+    var sql = `SELECT resetid FROM passwordReset WHERE resetid = ?`;
+    var params = [passwordResetID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
+    });
+}
+
+function resetPassword(passwordResetID, newPassword) {
+    var sql = `SELECT username FROM users JOIN (
+        SELECT email FROM passwordReset WHERE resetid = ?
+    ) passwordReset1 ON users.email = passwordReset1.email`;
+    var params = [passwordResetID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        setUserPassword(rows[0].username, newPassword);
+        sql = `DELETE FROM passwordReset WHERE resetid = ?`;
+        mainDB.execute(sql, params, (err, rows) => {
+            if (err) throw err;
+        });
+    });
+}
+
 function verifyLogin(username, password, callback) {
     var sql = `SELECT password FROM users WHERE username = ?;`;
     var params = [username];
@@ -578,8 +645,12 @@ module.exports = {
     'getDMImage': getDMImage,
     'getMessages': getMessages,
     'createMessage': createMessage,
+    'emailExists': emailExists,
+    'newPasswordResetID': newPasswordResetID,
+    'checkPasswordResetID': checkPasswordResetID,
+    'resetPassword': resetPassword,
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType
-}
+};
 
 init();

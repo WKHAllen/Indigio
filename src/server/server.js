@@ -3,6 +3,7 @@ const http = require('http');
 const sio = require('socket.io');
 const path = require('path');
 const database = require('./database.js');
+const passwordReset = require('./passwordReset.js');
 
 var app = express();
 const publicDir = 'public';
@@ -11,6 +12,17 @@ var server = http.Server(app);
 var io = sio(server);
 var port = process.env.PORT || 3000;
 server.listen(port);
+
+var serverAddress = server.address();
+var host = serverAddress.address;
+var port = serverAddress.port;
+if (host === '::') host = 'localhost';
+if (port === 80) port = '';
+var address;
+if (port) address = 'http://' + host + ':' + port;
+else address = 'http://' + host;
+
+console.log(`Server running on ${address}`);
 
 app.use(express.static(path.join(__dirname, publicDir)));
 
@@ -178,12 +190,34 @@ function login(socket, data) {
     });
 }
 
+function resetPassword(socket, data) {
+    database.emailExists(data.email, (res) => {
+        socket.emit('validPasswordReset', { 'res': res });
+        if (res) {
+            passwordReset.passwordReset(data.email, address);
+        }
+    });
+}
+
+function checkPasswordResetID(socket, data) {
+    database.checkPasswordResetID(data.passwordResetID, (res) => {
+        socket.emit('validPasswordResetID', { 'res': res });
+        if (res) {
+            socket.on('resetPassword', (newData) => {
+                database.resetPassword(data.passwordResetID, newData.newPassword);
+            });
+        }
+    });
+}
+
 function start() {
     io.on('connection', (socket) => {
         var date = (new Date()).toString();
         console.log(`[${date}] user joined`);
         socket.on('register', (data) => { register(socket, data); });
         socket.on('login', (data) => { login(socket, data); });
+        socket.on('passwordReset', (data) => { resetPassword(socket, data); });
+        socket.on('checkPasswordResetID', (data) => { checkPasswordResetID(socket, data); });
         socket.on('disconnect', () => {
             date = (new Date()).toString();
             console.log(`[${date}] user left`);

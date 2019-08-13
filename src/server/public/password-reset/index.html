@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Indigio - Password Reset</title>
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../main.css">
+        <script type="text/javascript" src="../socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="../utils.js"></script>
+        <script type="text/javascript" src="password-reset.js"></script>
+    </head>
+    <body class="main">
+        <div id="menu-bar">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <h3 class="title">Indigio</h3>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Password Reset</h1>
+            <div class="middle-content">
+                <label class="form-label" for="email" id="email-label">Email</label>
+                <input class="form-input" type="email" id="email" maxlength="32" onkeydown="onEnter();">
+                <label class="form-label invisible" for="password" id="password-label">New password</label>
+                <input class="form-input invisible" type="password" id="password" minlength="8" maxlength="64" onkeydown="onResetEnter();">
+                <label class="form-label invisible" for="confirm-password" id="confirm-password-label">Confirm new password</label>
+                <input class="form-input invisible" type="password" id="confirm-password" minlength="8" maxlength="64" onkeydown="onResetEnter();">
+                <button class="form-button" type="button" onclick="reset();" id="reset-button">Reset</button>
+                <p class="invisible" id="error-text"></p>
+                <p>Already have an account? <a href="/login/">Log in here</a>.</p>
+                <p>Don't have an account? <a href="/register/">Create one here</a>.</p>
+                <p>Don't have the app downloaded? <a href="/downloads/">Download it here</a>.</p>
+            </div>
+        </div>
+    </body>
+</html>
