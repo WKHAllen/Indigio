@@ -1,6 +1,9 @@
 const { app, BrowserWindow, globalShortcut } = require('electron');
+const path = require('path');
 
 var win;
+
+var assetsDir = 'assets';
 
 function toggleKiosk() {
     win.setKiosk(!win.isKiosk());
@@ -13,7 +16,7 @@ function createWindow() {
         center: true,
         frame: false,
         title: 'Indigio',
-        // icon
+        icon: path.join(__dirname, assetsDir, 'icon.ico'),
         backgroundColor: '#001f4f',
         darkTheme: true,
         webPreferences: {
