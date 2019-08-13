@@ -46,9 +46,10 @@ function openRoom(roomid) {
     window.location.replace(newURL.href);
 }
 
-function addNewRoom(parentElement, roomData, socket) {
+function addNewRoom(parentElement, roomData) {
     var newRoom = document.createElement('li');
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
+    newRoom.setAttribute('id', `room-${roomData.id}`);
     // Image
     var roomImage = document.createElement('img');
     roomImage.setAttribute('src', roomData.imageURL);
@@ -123,7 +124,8 @@ function main() {
             roomList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
             messageDiv.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
         } else {
-            roomList.innerHTML = '';
+            roomList.getElementsByClassName('loading')[0].classList.add('invisible');
+            roomList.getElementsByClassName('loading')[0].parentElement.classList.remove('space-above');
             if (roomID === null) {
                 openRoom(data[0].id);
                 return;
@@ -157,8 +159,11 @@ function main() {
                 } else {
                     addNewMessage(messagesDiv, data);
                 }
-            } else {
-                // TODO: move room on left panel to top and indicate that there is a new message
+            }
+            if (roomList.children.length > 1) {
+                var room = document.getElementById(`room-${data.roomid}`);
+                roomList.removeChild(room);
+                roomList.insertBefore(room, roomList.children[1]);
             }
         });
     });

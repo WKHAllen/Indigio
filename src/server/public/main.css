@@ -441,10 +441,6 @@ a:focus {
     padding-bottom: var(--std-padding);
 }
 
-.space-above {
-    margin-top: var(--std-padding);
-}
-
 .checkbox-container {
     display: block;
     position: relative;
@@ -616,4 +612,8 @@ a:focus {
 
 .loading {
     color: var(--message-timestamp-color);
+}
+
+.space-above {
+    margin-top: var(--std-padding);
 }
