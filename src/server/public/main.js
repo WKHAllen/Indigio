@@ -117,13 +117,13 @@ function main() {
             for (var message of data) {
                 addNewMessage(messagesDiv, message, socket);
             }
-            messagesDiv.scrollTo(0, messagesDiv.scrollHeight);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
         socket.on('incomingMessage', (data) => {
             if (data.roomid === roomID) {
                 if (username === data.username || messagesDiv.scrollTop >= messagesDiv.scrollHeight - messagesDiv.clientHeight) {
                     addNewMessage(messagesDiv, data, socket);
-                    messagesDiv.scrollTo(0, messagesDiv.scrollHeight);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } else {
                     addNewMessage(messagesDiv, data, socket);
                 }
