@@ -8,7 +8,7 @@ const password = localStorage.getItem(localPassword);
 
 const defaultSettings = { 'textSize': 12, 'imageSize': 24 };
 
-const messageGroupSize = 30;
+const messageGroupSize = 50;
 
 const dmRoomType = 0;
 

@@ -194,8 +194,8 @@ function register(socket, data) {
 }
 
 function login(socket, data) {
-    database.verifyLogin(data.username, data.password, (res) => {
-        socket.emit('validLogin', { 'res': res });
+    database.verifyLogin(data.username, data.password, (res, username) => {
+        socket.emit('validLogin', { 'res': res, 'username': username });
         if (res) {
             console.log('USER SUCCESSFULLY LOGGED IN');
             main(socket, data.username);

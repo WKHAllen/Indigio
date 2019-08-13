@@ -607,11 +607,10 @@ function resetPassword(passwordResetID, newPassword) {
 }
 
 function verifyLogin(username, password, callback) {
-    var sql = `SELECT password FROM users WHERE username = ?;`;
-    var params = [username];
+    var sql = `SELECT username, password FROM users WHERE username = ? OR email = ?;`;
+    var params = [username, username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (rows.length > 1) throw `ERROR: multiple instances of user ${username}`;
         if (rows.length === 0) {
             if (callback) callback(false);
         } else {
@@ -623,8 +622,10 @@ function verifyLogin(username, password, callback) {
                     mainDB.execute(sql, params, (err, rows) => {
                         if (err) throw err;
                     });
+                    if (callback) callback(true, rows[0].username);
+                } else if (callback) {
+                    callback(false);
                 }
-                if (callback) callback(res);
             });
         }
     });
