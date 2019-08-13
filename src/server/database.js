@@ -96,8 +96,8 @@ function createUser(username, displayname, email, password, callback) {
                 params = [username, displayname, email, hash, getTime()];
                 mainDB.execute(sql, params, (err, rows) => {
                     if (err) throw err;
+                    if (callback) callback(true);
                 });
-                if (callback) callback(true);
             });
         }
     });
@@ -499,10 +499,24 @@ function getDMImage(username, roomID, callback) {
 
 function getMessages(roomID, size, callback) {
     var sql = `
-        SELECT text, username, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+        SELECT text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
             SELECT text, userid, roomid, createTimestamp FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp ASC;`;
     var params = [roomID, size];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
+    });
+}
+
+function getMoreMessages(roomID, size, loadedMessages, callback) {
+    var sql = `
+        SELECT text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+            SELECT text, userid, roomid, createTimestamp FROM messages WHERE id NOT IN (
+                SELECT id FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
+            ) AND roomid = ? LIMIT ?
+        ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp DESC;`;
+    var params = [roomID, loadedMessages, roomID, size];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows);
@@ -644,6 +658,7 @@ module.exports = {
     'userInRoom': userInRoom,
     'getDMImage': getDMImage,
     'getMessages': getMessages,
+    'getMoreMessages': getMoreMessages,
     'createMessage': createMessage,
     'emailExists': emailExists,
     'newPasswordResetID': newPasswordResetID,

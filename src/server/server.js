@@ -140,13 +140,25 @@ function getMessages(socket, username, data) {
     });
 }
 
+function getMoreMessages(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getMoreMessages(data.roomid, data.size, data.loadedMessages, (data) => {
+                socket.emit('returnMoreMessages', data);
+            });
+        }
+    });
+}
+
 function newMessage(username, data) {
     database.userInRoom(username, data.roomid, (res) => {
         if (res) {
             database.createMessage(data.text, username, data.roomid);
             var now = Math.floor(new Date().getTime() / 1000);
-            database.getUserImage(username, (image) => {
-                io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+            database.getUserDisplayname(username, (displayname) => {
+                database.getUserImage(username, (image) => {
+                    io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                });
             });
         }
     });
@@ -171,6 +183,7 @@ function main(socket, username) {
     socket.on('getRooms', () => { getRooms(socket, username); });
     socket.on('getDMImage', (data) => { getDMImage(socket, username, data); });
     socket.on('getMessages', (data) => { getMessages(socket, username, data); });
+    socket.on('getMoreMessages', (data) => { getMoreMessages(socket, username, data); });
     socket.on('newMessage', (data) => { newMessage(username, data); });
 }
 

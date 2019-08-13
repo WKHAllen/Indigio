@@ -2,6 +2,8 @@ var loaded = false;
 
 var socket;
 
+var loadedMessages;
+
 var roomID = parseInt(new URLSearchParams(window.location.search).get('roomid')) || null;
 if (roomID === null) {
     roomID = localStorage.getItem(localOpenRoom);
@@ -58,18 +60,18 @@ function addNewRoom(parentElement, roomData, socket) {
     parentElement.appendChild(newRoom);
 }
 
-function addNewMessage(parentElement, messageData) {
+function buildMessage(messageData) {
     var newMessage = document.createElement('div');
     newMessage.classList.add('message');
     // Image
     messageImg = document.createElement('img');
     messageImg.setAttribute('src', messageData.imageURL);
     newMessage.appendChild(messageImg);
-    // Username
-    messageUsername = document.createElement('span');
-    messageUsername.classList.add('username');
-    messageUsername.innerHTML = messageData.username;
-    newMessage.appendChild(messageUsername);
+    // Displayname
+    messageDisplayname = document.createElement('span');
+    messageDisplayname.classList.add('displayname');
+    messageDisplayname.innerHTML = messageData.displayname;
+    newMessage.appendChild(messageDisplayname);
     // Timestamp
     messageTimestamp = document.createElement('span');
     messageTimestamp.classList.add('timestamp');
@@ -80,7 +82,34 @@ function addNewMessage(parentElement, messageData) {
     messageContent.classList.add('message-content');
     messageContent.innerHTML = messageData.text;
     newMessage.appendChild(messageContent);
+    return newMessage;
+}
+
+function addNewMessage(parentElement, messageData) {
+    var newMessage = buildMessage(messageData);
     parentElement.appendChild(newMessage);
+}
+
+function addNewMessageAbove(parentElement, messageData) {
+    var newMessage = buildMessage(messageData);
+    parentElement.insertBefore(newMessage, parentElement.children[1]);
+}
+
+function loadMessages() {
+    var messagesDiv = document.getElementById('messages');
+    if (messagesDiv.scrollTop === 0) {
+        var distanceFromBottom = messagesDiv.scrollHeight - messagesDiv.scrollTop
+        socket.emit('getMoreMessages', { 'roomid': roomID, 'size': messageGroupSize, 'loadedMessages': loadedMessages });
+        socket.on('returnMoreMessages', (data) => {
+            loadedMessages += messageGroupSize;
+            for (var message of data) {
+                addNewMessageAbove(messagesDiv, message);
+            }
+            if (data.length === 0)
+                messagesDiv.removeAttribute('onscroll');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight - distanceFromBottom;
+        });
+    }
 }
 
 function main() {
@@ -114,18 +143,19 @@ function main() {
         messagesDiv.getElementsByClassName('loading')[0].classList.add('invisible');
         socket.emit('getMessages', { 'roomid': roomID, 'size': messageGroupSize });
         socket.on('returnMessages', (data) => {
+            loadedMessages = messageGroupSize;
             for (var message of data) {
-                addNewMessage(messagesDiv, message, socket);
+                addNewMessage(messagesDiv, message);
             }
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
         socket.on('incomingMessage', (data) => {
             if (data.roomid === roomID) {
                 if (username === data.username || messagesDiv.scrollTop >= messagesDiv.scrollHeight - messagesDiv.clientHeight) {
-                    addNewMessage(messagesDiv, data, socket);
+                    addNewMessage(messagesDiv, data);
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } else {
-                    addNewMessage(messagesDiv, data, socket);
+                    addNewMessage(messagesDiv, data);
                 }
             } else {
                 // TODO: move room on left panel to top and indicate that there is a new message

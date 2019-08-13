@@ -402,7 +402,7 @@ a:focus {
     padding: calc((var(--message-height) - var(--message-img-height)) / 2);
 }
 
-.message .username {
+.message .displayname {
     color: var(--message-user-color);
     padding-left: calc(var(--std-padding) / 2);
     padding-right: var(--std-padding);
@@ -419,7 +419,7 @@ a:focus {
     max-width: 100%;
 }
 
-.message .username, .message .timestamp, .message .message-content {
+.message .displayname, .message .timestamp, .message .message-content {
     float: left;
     white-space: normal;
 }
