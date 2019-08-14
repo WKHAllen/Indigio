@@ -231,6 +231,12 @@ a:focus {
     height: var(--menu-bar-height);
 }
 
+#menu-bar img {
+    width: calc(var(--menu-bar-height) * 0.8);
+    height: calc(var(--menu-bar-height) * 0.8);
+    padding: calc(var(--menu-bar-height) * 0.1);
+}
+
 #menu-list {
     -webkit-app-region: no-drag;
     position: absolute;
@@ -239,6 +245,7 @@ a:focus {
     list-style-type: none;
     background-color: var(--menu-color);
     height: 100%;
+    margin-left: var(--menu-bar-height);
 }
 
 #menu-list li {
@@ -266,6 +273,13 @@ a:focus {
 
 #menu-list li a button:focus {
     box-shadow: none;
+}
+
+.main-title {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    margin: auto;
 }
 
 .title {
