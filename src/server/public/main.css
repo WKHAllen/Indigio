@@ -389,6 +389,13 @@ a:focus {
     background-color: var(--menu-dark-active);
 }
 
+#room-list button {
+    width: 100%;
+    /* padding: 0; */
+    /* width: var(--room-li-img-height); */
+    /* height: var(--room-li-img-height); */
+}
+
 #current-room {
     float: left;
     width: calc(100% - var(--rooms-panel-width));
@@ -612,6 +619,10 @@ a:focus {
 }
 
 #friends-outgoing li span {
+    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+}
+
+#room-members-list li span {
     width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
 }
 

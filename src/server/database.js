@@ -7,6 +7,8 @@ const dbDir = 'db';
 const dbFile = path.join(dbDir, 'main.db');
 const saltRounds = 14;
 const dmRoomType = 0;
+const normalRoomType = 1;
+const defaultRoomName = 'New room';
 const hexLength = 64;
 
 var mainDB = new db.DB(path.join(__dirname, dbFile));
@@ -144,6 +146,15 @@ function setUserImage(username, imageURL) {
     var params = [imageURL, username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
+    });
+}
+
+function userExists(username, callback) {
+    var sql = `SELECT username FROM users WHERE username = ?;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
     });
 }
 
@@ -340,18 +351,19 @@ function getDMRoomID(username1, username2, callback) {
     });
 }
 
-function createRoom(roomType, name, callback) {
+function createRoom(creatorUsername, roomType, name, callback) {
     var sql = `
         INSERT INTO rooms (
-            roomType, name, createTimestamp, updateTimestamp
+            creatorid, roomType, name, createTimestamp, updateTimestamp
         ) VALUES (
+            (SELECT id FROM users WHERE username = ?),
             ?, 
             ?, 
             ?,
             ?
         );`;
     var now = getTime();
-    var params = [roomType, name, now, now];
+    var params = [creatorUsername, roomType, name, now, now];
     var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
     mainDB.executeAfter(sql, params, (err, rows) => {
         if (err) throw err;
@@ -377,7 +389,7 @@ function deleteRoom(roomID) {
     });
 }
 
-function addToRoom(roomID, username) {
+function addToRoom(roomID, username, callback) {
     var sql = `
         SELECT roomid FROM roomUsers WHERE roomid = ? AND userid = (
             SELECT id FROM users WHERE username = ?
@@ -397,12 +409,13 @@ function addToRoom(roomID, username) {
             params = [roomID, username, getTime()];
             mainDB.execute(sql, params, (err, rows) => {
                 if (err) throw err;
+                if (callback) callback();
             });
         }
     })
 }
 
-function removeFromRoom(roomID, username) {
+function removeFromRoom(roomID, username, callback) {
     var sql = `
         DELETE FROM roomUsers WHERE roomid = ? AND userid = (
             SELECT id FROM users WHERE username = ?
@@ -410,6 +423,16 @@ function removeFromRoom(roomID, username) {
     var params = [roomID, username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
+        if (callback) callback();
+    });
+}
+
+function getRoomName(roomID, callback) {
+    var sql = `SELECT name FROM rooms WHERE id = ?;`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].name);
     });
 }
 
@@ -421,11 +444,29 @@ function setRoomName(roomID, name) {
     });
 }
 
+function getRoomImage(roomID, callback) {
+    var sql = `SELECT imageURL FROM rooms WHERE id = ?;`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].imageURL);
+    });
+}
+
 function setRoomImage(roomID, imageURL) {
     var sql = `UPDATE rooms SET imageURL = ? WHERE id = ?;`;
     var params = [imageURL, roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
+    });
+}
+
+function getRoomInfo(roomID, callback) {
+    var sql = `SELECT * FROM rooms WHERE id = ?;`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0]);
     });
 }
 
@@ -461,9 +502,9 @@ function getRooms(username, callback) {
 
 function getUsersInRoom(roomID, callback) {
     var sql = `
-        SELECT username FROM users WHERE id = (
-            SELECT userid FROM roomUsers WHERE roomid = ?
-        );`;
+        SELECT username, displayname, imageURL FROM users JOIN (
+            SELECT userid, roomid, joinTimestamp FROM roomUsers WHERE roomid = ?
+        ) roomUsers1 ON users.id = roomUsers1.userid ORDER BY roomUsers1.joinTimestamp ASC;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
@@ -480,6 +521,69 @@ function userInRoom(username, roomID, callback) {
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows.length > 0);
+    });
+}
+
+function getRoomType(roomID, callback) {
+    var sql = `SELECT roomType FROM rooms WHERE id = ?;`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) {
+            if (rows.length === 0) {
+                callback(null);
+            } else {
+                callback(rows[0].roomType);
+            }
+        }
+    });
+}
+
+function getRoomCreator(roomID, callback) {
+    var sql = `
+        SELECT username FROM users JOIN (
+            SELECT roomid, userid FROM roomUsers WHERE roomid = ?
+        ) roomUsers1 ON users.id = roomUsers1.userid JOIN (
+            SELECT id FROM rooms WHERE id = ?
+        ) rooms1 ON roomUsers1.roomid = rooms1.id;`
+    var params = [roomID, roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].username);
+    });
+}
+
+function isRoomCreator(username, roomID, callback) {
+    getRoomCreator(roomID, (creatorUsername) => {
+        callback(username === creatorUsername);
+    });
+}
+
+function reassignCreator(roomID) {
+    var sql = `UPDATE rooms SET creatorid = (
+        SELECT userid FROM roomUsers WHERE roomid = ? ORDER BY joinTimestamp ASC LIMIT 1
+    ) WHERE id = ?;`;
+    var params = [roomID, roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
+function deleteRoomIfEmpty(roomID, callback) {
+    var sql = `SELECT userid FROM roomUsers WHERE roomid = ?`;
+    var params = [roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (rows.length === 0) {
+            sql = `DELETE FROM rooms WHERE id = ?`;
+            params = [roomID];
+            mainDB.execute(sql, params, (err, rows) => {
+                if (err) throw err;
+                callback(true);
+            });
+        } else {
+            callback(false);
+        }
     });
 }
 
@@ -638,6 +742,7 @@ module.exports = {
     'setUserDisplayname': setUserDisplayname,
     'getUserImage': getUserImage,
     'setUserImage': setUserImage,
+    'userExists': userExists,
     'addFriend': addFriend,
     'removeFriend': removeFriend,
     'getFriends': getFriends,
@@ -652,11 +757,19 @@ module.exports = {
     'deleteRoom': deleteRoom,
     'addToRoom': addToRoom,
     'removeFromRoom': removeFromRoom,
+    'getRoomName': getRoomName,
     'setRoomName': setRoomName,
+    'getRoomImage': getRoomImage,
     'setRoomImage': setRoomImage,
+    'getRoomInfo': getRoomInfo,
     'getRooms': getRooms,
     'getUsersInRoom': getUsersInRoom,
     'userInRoom': userInRoom,
+    'getRoomType': getRoomType,
+    'getRoomCreator': getRoomCreator,
+    'isRoomCreator': isRoomCreator,
+    'reassignCreator': reassignCreator,
+    'deleteRoomIfEmpty': deleteRoomIfEmpty,
     'getDMImage': getDMImage,
     'getMessages': getMessages,
     'getMoreMessages': getMoreMessages,
@@ -666,7 +779,9 @@ module.exports = {
     'checkPasswordResetID': checkPasswordResetID,
     'resetPassword': resetPassword,
     'verifyLogin': verifyLogin,
-    'dmRoomType': dmRoomType
+    'dmRoomType': dmRoomType,
+    'normalRoomType': normalRoomType,
+    'defaultRoomName': defaultRoomName
 };
 
 init();

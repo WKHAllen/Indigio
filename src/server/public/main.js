@@ -41,12 +41,12 @@ function validRoom(rooms) {
 }
 
 function openRoom(roomid) {
-    var newURL = new URL(window.location.href);
+    var newURL = new URL(window.location.origin);
     newURL.searchParams.set('roomid', roomid);
     window.location.replace(newURL.href);
 }
 
-function addNewRoom(parentElement, roomData) {
+function buildRoom(roomData) {
     var newRoom = document.createElement('li');
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
     newRoom.setAttribute('id', `room-${roomData.id}`);
@@ -58,7 +58,25 @@ function addNewRoom(parentElement, roomData) {
     var roomName = document.createElement('span');
     roomName.innerHTML = roomData.name;
     newRoom.appendChild(roomName);
-    parentElement.appendChild(newRoom);
+    if (roomData.roomType !== dmRoomType) {
+        newRoom.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            var newURL = new URL(window.location.origin + '/manage-room');
+            newURL.searchParams.set('roomid', roomData.id);
+            window.location.replace(newURL.href);
+        });
+    }
+    return newRoom;
+}
+
+function addNewRoom(parentElement, roomData) {
+    var newRoom = buildRoom(roomData);
+    parentElement.insertBefore(newRoom, parentElement.lastElementChild);
+}
+
+function addNewRoomAbove(parentElement, roomData) {
+    var newRoom = buildRoom(roomData);
+    parentElement.insertBefore(newRoom, parentElement.children[1]);
 }
 
 function buildMessage(messageData) {
@@ -113,11 +131,27 @@ function loadMessages() {
     }
 }
 
+function createRoom() {
+    socket.emit('createRoom');
+}
+
+function removeRoom(roomid) {
+    if (roomid === roomID) {
+        window.location.reload();
+    } else {
+        var roomListItem = document.getElementById(`room-${roomid}`);
+        roomListItem.parentNode.removeChild(roomListItem);
+    }
+}
+
 function main() {
-    document.getElementById('main-input').setAttribute('onkeydown', 'onEnter();');
-    // TODO: set socket.on events for adding/removing rooms, etc.
+    var mainInput = document.getElementById('main-input');
+    mainInput.removeAttribute('disabled');
+    mainInput.setAttribute('onkeydown', 'onEnter();');
     socket.emit('getRooms');
     socket.on('returnRooms', (data) => {
+        var createRoomButton = document.getElementById('create-room-button');
+        createRoomButton.removeAttribute('disabled');
         var roomList = document.getElementById('room-list');
         var messageDiv = document.getElementById('messages');
         if (data.length === 0) {
@@ -165,6 +199,15 @@ function main() {
                 roomList.removeChild(room);
                 roomList.insertBefore(room, roomList.children[1]);
             }
+        });
+        socket.on('newRoom', (roomData) => {
+            addNewRoomAbove(roomList, roomData);
+        });
+        socket.on('roomJoin', (roomData) => {
+            addNewRoomAbove(roomList, roomData);
+        });
+        socket.on('roomKick', (roomData) => {
+            removeRoom(roomData.roomid);
         });
     });
 }

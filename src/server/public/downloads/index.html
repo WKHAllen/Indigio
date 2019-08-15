@@ -5,9 +5,14 @@
         <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="../main.css">
         <script type="text/javascript" src="../utils.js"></script>
+        <script type="text/javascript" src="downloads.js"></script>
     </head>
     <body class="main">
         <div id="menu-bar">
+            <div class="main-title">
+                <h3 class="title">Indigio</h3>
+            </div>
+            <img src="/favicon.ico">
             <ul id="menu-list">
                 <li><a href="/"><button>Home</button></a></li><!--
              --><li><a href="/about/"><button>About</button></a></li><!--
@@ -16,7 +21,6 @@
              --><li><a href="/friends/"><button>Friends</button></a></li><!--
              --><li><a href="/logout/"><button>Logout</button></a></li>
             </ul>
-            <h3 class="title">Indigio</h3>
             <ul id="window-menu" class="invisible">
                 <li><button onclick="windowMinimize();">-</button></li><!--
              --><li><button onclick="windowMaximize();">O</button></li><!--
@@ -26,7 +30,13 @@
         <div class="main-div">
             <h1 class="centered-text">Downloads</h1>
             <div class="middle-content">
-                <p>Download links will appear here once release versions have been created. If you'd like to speed up the development process, feel free to contribute by visiting the <a href="https://github.com/WKHAllen/Indigio" target="_blank">Indigio repository</a>.</p>
+                <div id="downloads">
+                    <p>Download links will appear here once release versions have been created. If you'd like to speed up the development process, feel free to contribute by visiting the <a href="https://github.com/WKHAllen/Indigio" target="_blank">Indigio repository</a>.</p>
+                </div>
+                <div id="no-downloads" class="invisible">
+                    <p>Looks like you already have the app! No need to download anything.</p>
+                </div>
+                <button class="space-above" onclick="goBack();">Return</button>
             </div>
         </div>
     </body>

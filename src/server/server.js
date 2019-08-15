@@ -24,6 +24,10 @@ else address = 'http://' + host;
 
 console.log(`Server running on ${address}`);
 
+var userSockets = new Map();
+var userSocketsReversed = new Map();
+var userRooms = new Map();
+
 app.use(express.static(path.join(__dirname, publicDir)));
 
 app.use(function(req, res, next) {
@@ -33,6 +37,10 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
     return res.status(500).send(path.join(__dirname, errorDir, '500.html'));
 });
+
+function getTime() {
+    return Math.floor(new Date().getTime() / 1000);
+}
 
 function getDisplayname(socket, username) {
     database.getUserDisplayname(username, (displayname) => {
@@ -96,7 +104,7 @@ function removeOutgoingFriendRequest(username, data) {
 function getDMRoomID(socket, username, data) {
     database.getDMRoomID(username, data.username, (rooms) => {
         if (rooms.length === 0) {
-            database.createRoom(database.dmRoomType, `${username}, ${data.username}`, (roomid) => {
+            database.createRoom(username, database.dmRoomType, `${username}, ${data.username}`, (roomid) => {
                 database.addToRoom(roomid, username);
                 database.addToRoom(roomid, data.username);
                 socket.emit('returnDMRoomID', { 'roomid': roomid });
@@ -118,8 +126,11 @@ function removeFriend(username, data) {
 function getRooms(socket, username) {
     database.getRooms(username, (data) => {
         socket.emit('returnRooms', data);
-        for (let room of data) {
+        for (var room of data) {
             socket.join(room.id.toString());
+            if (!userRooms.has(room.id))
+                userRooms.set(room.id, new Map());
+            userRooms.get(room.id).set(username, socket);
         }
     });
 }
@@ -154,11 +165,166 @@ function newMessage(username, data) {
     database.userInRoom(username, data.roomid, (res) => {
         if (res) {
             database.createMessage(data.text, username, data.roomid);
-            var now = Math.floor(new Date().getTime() / 1000);
+            var now = getTime();
             database.getUserDisplayname(username, (displayname) => {
                 database.getUserImage(username, (image) => {
                     io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
                 });
+            });
+        }
+    });
+}
+
+function createRoom(socket, username) {
+    database.createRoom(username, database.normalRoomType, database.defaultRoomName, (roomid) => {
+        database.addToRoom(roomid, username, () => {
+            var now = getTime();
+            socket.emit('newRoom', { 'id': roomid, 'roomType': database.normalRoomType, 'updateTimestamp': now, 'name': database.defaultRoomName, 'imageURL': null });
+            socket.join(roomid.toString());
+            userRooms.set(roomid, new Map());
+            userRooms.get(roomid).set(username, socket);
+        });
+    });
+}
+
+function getRoomName(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getRoomName(data.roomid, (name) => {
+                socket.emit('returnRoomName', { 'roomName': name });
+            });
+        }
+    });
+}
+
+function setRoomName(username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.setRoomName(data.roomid, data.roomName);
+        }
+    });
+}
+
+function getRoomImage(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getRoomImage(data.roomid, (image) => {
+                socket.emit('returnRoomImage', { 'roomImage': image });
+            });
+        }
+    });
+}
+
+function setRoomImage(username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.setRoomImage(data.roomid, data.roomImage);
+        }
+    });
+}
+
+function checkValidRoom(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        database.getRoomType(data.roomid, (roomType) => {
+            if (!res || roomType === null || roomType === database.dmRoomType) {
+                socket.emit('validRoom', { 'res': false });
+            } else {
+                database.isRoomCreator(username, data.roomid, (isCreator) => {
+                    socket.emit('validRoom', { 'res': true, 'creator': isCreator });
+                });
+            }
+        });
+    });
+}
+
+function deleteRoom(username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getRoomType(data.roomid, (roomType) => {
+                if (roomType !== null && roomType !== database.dmRoomType) {
+                    database.deleteRoom(data.roomid);
+                    if (!userRooms.has(data.roomid))
+                        userRooms.set(data.roomid, new Map());
+                    userRooms.get(data.roomid).forEach((socket, name, map) => {
+                        socket.emit('roomKick', { 'roomid': data.roomid });
+                        socket.leave(data.roomid.toString());
+                    });
+                    userRooms.delete(data.roomid);
+                }
+            });
+        }
+    });
+}
+
+function removeRoomMember(username, data) {
+    database.isRoomCreator(username, data.roomid, (isCreator) => {
+        if (isCreator) {
+            database.removeFromRoom(data.roomid, data.memberUsername, () => {
+                database.deleteRoomIfEmpty(data.roomid, (deleted) => {
+                    if (!deleted && username === data.memberUsername) {
+                        database.reassignCreator(data.roomid);
+                    }
+                    if (!userRooms.has(data.roomid))
+                        userRooms.set(data.roomid, new Map());
+                    userRooms.get(data.roomid).get(data.memberUsername).emit('roomKick', { 'roomid': data.roomid });
+                    userRooms.get(data.roomid).get(data.memberUsername).leave(data.roomid.toString());
+                    if (deleted) {
+                        userRooms.delete(data.roomid);
+                    } else {
+                        userRooms.get(data.roomid).delete(data.memberUsername);
+                    }
+                });
+            });
+        }
+    });
+}
+
+function leaveRoom(username, data) {
+    database.isRoomCreator(username, data.roomid, (isCreator) => {
+        database.removeFromRoom(data.roomid, username, () => {
+            database.deleteRoomIfEmpty(data.roomid, (deleted) => {
+                if (!deleted && isCreator) {
+                    database.reassignCreator(data.roomid);
+                }
+                if (!userRooms.has(data.roomid))
+                    userRooms.set(data.roomid, new Map());
+                userRooms.get(data.roomid).get(username).emit('roomKick', { 'roomid': data.roomid });
+                userRooms.get(data.roomid).get(username).leave(data.roomid.toString());
+                if (deleted) {
+                    userRooms.delete(data.roomid);
+                } else {
+                    userRooms.get(data.roomid).delete(username);
+                }
+            });
+        });
+    });
+}
+
+function getRoomMembers(socket, username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.getUsersInRoom(data.roomid, (data) => {
+                socket.emit('returnRoomMembers', data);
+            });
+        }
+    });
+}
+
+function addRoomMember(username, data) {
+    database.userInRoom(username, data.roomid, (res) => {
+        if (res) {
+            database.userExists(data.memberUsername, (res) => {
+                if (res) {
+                    database.addToRoom(data.roomid, data.memberUsername);
+                    if (userSockets.has(data.memberUsername)) {
+                        if (!userRooms.has(data.roomid))
+                            userRooms.set(data.roomid, new Map());
+                        userRooms.get(data.roomid).set(data.memberUsername, userSockets.get(data.memberUsername));
+                        database.getRoomInfo(data.roomid, (roomData) => {
+                            userSockets.get(data.memberUsername).emit('roomJoin', { 'id': roomData.id, 'roomType': roomData.roomType, 'updateTimestamp': roomData.updateTimestamp, 'name': roomData.name, 'imageURL': roomData.imageURL });
+                        });
+                    }
+                }
             });
         }
     });
@@ -185,6 +351,17 @@ function main(socket, username) {
     socket.on('getMessages', (data) => { getMessages(socket, username, data); });
     socket.on('getMoreMessages', (data) => { getMoreMessages(socket, username, data); });
     socket.on('newMessage', (data) => { newMessage(username, data); });
+    socket.on('createRoom', () => { createRoom(socket, username); });
+    socket.on('getRoomName', (data) => { getRoomName(socket, username, data); });
+    socket.on('setRoomName', (data) => { setRoomName(username, data); });
+    socket.on('getRoomImage', (data) => { getRoomImage(socket, username, data); });
+    socket.on('setRoomImage', (data) => { setRoomImage(username, data); });
+    socket.on('checkValidRoom', (data) => { checkValidRoom(socket, username, data); });
+    socket.on('deleteRoom', (data) => { deleteRoom(username, data); });
+    socket.on('removeRoomMember', (data) => { removeRoomMember(username, data); });
+    socket.on('leaveRoom', (data) => { leaveRoom(username, data); });
+    socket.on('getRoomMembers', (data) => { getRoomMembers(socket, username, data); });
+    socket.on('addRoomMember', (data) => { addRoomMember(username, data); });
 }
 
 function register(socket, data) {
@@ -198,6 +375,8 @@ function login(socket, data) {
         socket.emit('validLogin', { 'res': res, 'username': username });
         if (res) {
             console.log('USER SUCCESSFULLY LOGGED IN');
+            userSockets.set(data.username, socket);
+            userSocketsReversed.set(socket, data.username);
             main(socket, data.username);
         }
     });
@@ -234,6 +413,8 @@ function start() {
         socket.on('disconnect', () => {
             date = (new Date()).toString();
             console.log(`[${date}] user left`);
+            userSockets.delete(userSocketsReversed.get(socket));
+            userSocketsReversed.delete(socket);
         });
     });
 }

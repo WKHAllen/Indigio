@@ -13,7 +13,7 @@
             <div class="main-title">
                 <h3 class="title">Indigio</h3>
             </div>
-            <img src="favicon.ico">
+            <img src="/favicon.ico">
             <ul id="menu-list">
                 <li><a href="/"><button>Home</button></a></li><!--
              --><li><a href="/about/"><button>About</button></a></li><!--
@@ -32,6 +32,9 @@
             <div id="rooms-panel">
                 <ul id="room-list">
                     <div class="centered-div space-above"><span class="loading">Loading...</span></div>
+                    <div class="centered-div padded">
+                        <button id="create-room-button" onclick="createRoom();" disabled>New room</button>
+                    </div>
                 </ul>
             </div>
             <div id="current-room">
@@ -39,7 +42,7 @@
                     <div class="centered-div"><span class="loading">Loading...</span></div>
                 </div>
                 <div id="input">
-                    <input type="text" id="main-input" maxlength="2000">
+                    <input type="text" id="main-input" maxlength="2000" disabled>
                 </div>
             </div>
         </div>

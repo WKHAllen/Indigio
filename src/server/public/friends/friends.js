@@ -34,7 +34,7 @@ function searchFriends() {
     } else {
         searchResultsList.getElementsByClassName('loading')[0].classList.add('invisible');
     }
-    for (let result of results)
+    for (var result of results)
         addNewSearchResult(searchResultsList, result);
     document.getElementById('search-results-div').classList.remove('invisible');
 }
@@ -197,7 +197,7 @@ function populateFriends() {
                     friendsList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
                 else
                     friendsList.innerHTML = '';
-                for (let friend of data) {
+                for (var friend of data) {
                     addNewFriend(friendsList, friend);
                 }
                 // get incoming friend requests
@@ -208,7 +208,7 @@ function populateFriends() {
                         friendsIncoming.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
                     else
                         friendsIncoming.innerHTML = '';
-                    for (let friend of data) {
+                    for (var friend of data) {
                         addNewIncomingFriend(friendsIncoming, friend);
                     }
                     // get outgoing friend requests
@@ -219,7 +219,7 @@ function populateFriends() {
                             friendsOutgoing.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
                         else
                             friendsOutgoing.innerHTML = '';
-                        for (let friend of data) {
+                        for (var friend of data) {
                             addNewOutgoingFriend(friendsOutgoing, friend);
                         }
                         socket.disconnect();

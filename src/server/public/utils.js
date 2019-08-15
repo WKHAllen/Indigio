@@ -55,3 +55,11 @@ function onEnterClick(buttonID) {
         document.getElementById(buttonID).click();
     }
 }
+
+function goBack() {
+    window.history.back();
+}
+
+function goHome() {
+    window.location.replace('/');
+}
