@@ -311,6 +311,7 @@ a:focus {
     height: 100%;
     border-radius: 0;
     outline: none;
+    padding: 0;
 }
 
 #window-menu li button:hover {
@@ -323,6 +324,12 @@ a:focus {
 
 #window-menu li button:focus {
     box-shadow: none;
+}
+
+#window-menu li button img {
+    width: calc(var(--menu-bar-height) * 0.5);
+    height: calc(var(--menu-bar-height) * 0.5);
+    padding: calc(var(--menu-bar-height) * 0.25);
 }
 
 .main-screen {
