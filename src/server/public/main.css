@@ -369,7 +369,7 @@ a:focus {
 }
 
 #room-list li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
+    width: calc(100% - var(--room-li-height));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -391,9 +391,6 @@ a:focus {
 
 #room-list button {
     width: 100%;
-    /* padding: 0; */
-    /* width: var(--room-li-img-height); */
-    /* height: var(--room-li-img-height); */
 }
 
 #current-room {
@@ -546,6 +543,17 @@ a:focus {
     padding-right: var(--std-padding);
 }
 
+.account-info tr td.wrap {
+    white-space: -moz-pre-wrap !important;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    white-space: -webkit-pre-wrap;
+    word-break: break-all;
+    white-space: normal;
+}
+
 .std-panel {
     background-color: var(--menu-dark-color);
     width: 100%;
@@ -571,7 +579,7 @@ a:focus {
 }
 
 .std-panel ul li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--scrollbar-width));
+    width: calc(100% - var(--room-li-height));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -607,23 +615,27 @@ a:focus {
 }
 
 #search-results-list li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - 2 * var(--friend-button-width));
 }
 
 #friends-list li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - 3 * var(--friend-button-width));
 }
 
 #friends-incoming li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - 2 * var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - 2 * var(--friend-button-width));
 }
 
 #friends-outgoing li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - var(--friend-button-width));
 }
 
 #room-members-list li span {
-    width: calc(100% - var(--room-li-height) - ((var(--room-li-height) - var(--room-li-img-height)) / 2) - var(--friend-button-width));
+    width: calc(100% - var(--room-li-height) - var(--friend-button-width));
+}
+
+#room-members-list li span.creator {
+    width: calc(100% - var(--room-li-height) - 2 * var(--friend-button-width));
 }
 
 .invisible {

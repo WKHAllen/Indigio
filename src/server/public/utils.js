@@ -63,3 +63,9 @@ function goBack() {
 function goHome() {
     window.location.replace('/');
 }
+
+function viewProfile(theUsername) {
+    var newURL = new URL(window.location.origin + '/profile');
+    newURL.searchParams.set('username', theUsername);
+    window.location.replace(newURL.href);
+}

@@ -330,6 +330,18 @@ function addRoomMember(username, data) {
     });
 }
 
+function getOtherDMMemberUsername(socket, username, data) {
+    database.getOtherDMMemberUsername(data.roomid, username, (memberUsername) => {
+        socket.emit('returnOtherDMMemberUsername', { 'username': memberUsername });
+    });
+}
+
+function checkIsFriend(socket, username, data) {
+    database.checkIsFriend(username, data.username, (res) => {
+        socket.emit('isFriend', { 'res': res });
+    });
+}
+
 function main(socket, username) {
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
@@ -362,6 +374,8 @@ function main(socket, username) {
     socket.on('leaveRoom', (data) => { leaveRoom(username, data); });
     socket.on('getRoomMembers', (data) => { getRoomMembers(socket, username, data); });
     socket.on('addRoomMember', (data) => { addRoomMember(username, data); });
+    socket.on('getOtherDMMemberUsername', (data) => { getOtherDMMemberUsername(socket, username, data); });
+    socket.on('checkIsFriend', (data) => { checkIsFriend(socket, username, data); });
 }
 
 function register(socket, data) {
@@ -402,6 +416,12 @@ function checkPasswordResetID(socket, data) {
     });
 }
 
+function getUserInfo(socket, data) {
+    database.getUserInfo(data.username, (userInfo) => {
+        socket.emit('returnUserInfo', userInfo);
+    });
+}
+
 function start() {
     io.on('connection', (socket) => {
         var date = (new Date()).toString();
@@ -410,6 +430,7 @@ function start() {
         socket.on('login', (data) => { login(socket, data); });
         socket.on('passwordReset', (data) => { resetPassword(socket, data); });
         socket.on('checkPasswordResetID', (data) => { checkPasswordResetID(socket, data); });
+        socket.on('getUserInfo', (data) => { getUserInfo(socket, data); });
         socket.on('disconnect', () => {
             date = (new Date()).toString();
             console.log(`[${date}] user left`);

@@ -111,8 +111,14 @@ function addNewMember(parentElement, memberData, creator) {
     memberImage.setAttribute('src', memberData.imageURL);
     newMember.appendChild(memberImage);
     var memberName = document.createElement('span');
+    if (creator)
+        memberName.classList.add('creator');
     memberName.innerHTML = memberData.displayname;
     newMember.appendChild(memberName);
+    var memberProfile = document.createElement('button');
+    memberProfile.innerHTML = 'Profile';
+    memberProfile.setAttribute('onclick', `viewProfile('${memberData.username}');`);
+    newMember.appendChild(memberProfile);
     if (creator) {
         var memberRemove = document.createElement('button');
         memberRemove.innerHTML = 'Remove';

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Indigio</title>
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/main.css">
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/utils.js"></script>
+        <script type="text/javascript" src="profile.js"></script>
+    </head>
+    <body class="main">
+        <div id="menu-bar">
+            <div class="main-title">
+                <h3 class="title">Indigio</h3>
+            </div>
+            <img src="/favicon.ico">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();">-</button></li><!--
+             --><li><button onclick="windowMaximize();">O</button></li><!--
+             --><li><button onclick="windowClose();">X</button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text"><span id="title-username"></span>Profile</h1>
+            <div class="middle-content">
+                <table class="account-info">
+                    <tr>
+                        <td>Username: </td>
+                        <td id="username-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Display name: </td>
+                        <td id="displayname-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Image: </td>
+                        <td id="image-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Image URL: </td>
+                        <td id="image-url-label" class="wrap"><span class="loading">Loading...</span></td>
+                    </tr>
+                </table>
+                <div id="add-friend" class="invisible">
+                    <button type="button" class="space-above" id="add-friend-button" onclick="addFriend();">Add friend</button>
+                </div>
+                <div>
+                    <button type="button" class="space-above" onclick="goHome();">Home</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

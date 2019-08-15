@@ -120,7 +120,7 @@ function getUserDisplayname(username, callback) {
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].displayname);
+        if (callback && rows.length === 1) callback(rows[0].displayname);
     });
 }
 
@@ -137,7 +137,7 @@ function getUserImage(username, callback) {
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].imageURL);
+        if (callback && rows.length === 1) callback(rows[0].imageURL);
     });
 }
 
@@ -155,6 +155,20 @@ function userExists(username, callback) {
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows.length > 0);
+    });
+}
+
+function getUserInfo(username, callback) {
+    var sql = `SELECT username, displayname, imageURL FROM users WHERE username = ?;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) {
+            if (rows.length === 1)
+                callback(rows[0]);
+            else
+                callback(null);
+        }
     });
 }
 
@@ -215,7 +229,7 @@ function removeFriend(username1, username2) {
 
 function getFriends(username, callback) {
     var sql = `
-        SELECT username, displayname, imageURL FROM users JOIN (
+        SELECT users.id, username, displayname, imageURL FROM users JOIN (
             SELECT id2 FROM friends WHERE id1 = (
                 SELECT id FROM users WHERE username = ?
             )
@@ -224,6 +238,20 @@ function getFriends(username, callback) {
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
         if (callback) callback(rows);
+    });
+}
+
+function checkIsFriend(username, friendUsername, callback) {
+    var sql = `
+        SELECT id1, id2 FROM friends WHERE id1 = (
+            SELECT id FROM users WHERE username = ?
+        ) AND id2 = (
+            SELECT id FROM users WHERE username = ?
+        );`;
+    var params = [username, friendUsername];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
     });
 }
 
@@ -351,6 +379,22 @@ function getDMRoomID(username1, username2, callback) {
     });
 }
 
+function getOtherDMMemberUsername(roomID, username, callback) {
+    var sql = `
+        SELECT username FROM users JOIN (
+            SELECT userid, roomid FROM roomUsers WHERE roomid = ? AND userid != (
+                SELECT id FROM users WHERE username = ?
+            )
+        ) roomUsers1 ON users.id = roomUsers1.userid JOIN (
+            SELECT id FROM rooms WHERE id = ? AND roomType = ?
+        ) rooms1 ON roomUsers1.roomid = rooms1.id;`;
+    var params = [roomID, username, roomID, dmRoomType];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback && rows.length === 1) callback(rows[0].username);
+    });
+}
+
 function createRoom(creatorUsername, roomType, name, callback) {
     var sql = `
         INSERT INTO rooms (
@@ -369,7 +413,7 @@ function createRoom(creatorUsername, roomType, name, callback) {
         if (err) throw err;
     }, sqlAfter, [], (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].id);
+        if (callback && rows.length === 1) callback(rows[0].id);
     });
 }
 
@@ -432,7 +476,7 @@ function getRoomName(roomID, callback) {
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].name);
+        if (callback && rows.length === 1) callback(rows[0].name);
     });
 }
 
@@ -449,7 +493,7 @@ function getRoomImage(roomID, callback) {
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].imageURL);
+        if (callback && rows.length === 1) callback(rows[0].imageURL);
     });
 }
 
@@ -466,7 +510,7 @@ function getRoomInfo(roomID, callback) {
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0]);
+        if (callback && rows.length === 1) callback(rows[0]);
     });
 }
 
@@ -502,7 +546,7 @@ function getRooms(username, callback) {
 
 function getUsersInRoom(roomID, callback) {
     var sql = `
-        SELECT username, displayname, imageURL FROM users JOIN (
+        SELECT users.id, username, displayname, imageURL FROM users JOIN (
             SELECT userid, roomid, joinTimestamp FROM roomUsers WHERE roomid = ?
         ) roomUsers1 ON users.id = roomUsers1.userid ORDER BY roomUsers1.joinTimestamp ASC;`;
     var params = [roomID];
@@ -544,12 +588,17 @@ function getRoomCreator(roomID, callback) {
         SELECT username FROM users JOIN (
             SELECT roomid, userid FROM roomUsers WHERE roomid = ?
         ) roomUsers1 ON users.id = roomUsers1.userid JOIN (
-            SELECT id FROM rooms WHERE id = ?
-        ) rooms1 ON roomUsers1.roomid = rooms1.id;`
+            SELECT id, creatorid FROM rooms WHERE id = ?
+        ) rooms1 ON roomUsers1.roomid = rooms1.id AND users.id = rooms1.creatorid;`;
     var params = [roomID, roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0].username);
+        if (callback) {
+            if (rows.length === 1)
+                callback(rows[0].username);
+            else
+                callback(null);
+        }
     });
 }
 
@@ -597,7 +646,7 @@ function getDMImage(username, roomID, callback) {
     var params = [username, roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows[0]);
+        if (callback && rows.length === 1) callback(rows[0]);
     });
 }
 
@@ -696,17 +745,20 @@ function checkPasswordResetID(passwordResetID, callback) {
 }
 
 function resetPassword(passwordResetID, newPassword) {
-    var sql = `SELECT username FROM users JOIN (
-        SELECT email FROM passwordReset WHERE resetid = ?
-    ) passwordReset1 ON users.email = passwordReset1.email`;
+    var sql = `
+        SELECT username FROM users JOIN (
+            SELECT email FROM passwordReset WHERE resetid = ?
+        ) passwordReset1 ON users.email = passwordReset1.email`;
     var params = [passwordResetID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        setUserPassword(rows[0].username, newPassword);
-        sql = `DELETE FROM passwordReset WHERE resetid = ?`;
-        mainDB.execute(sql, params, (err, rows) => {
-            if (err) throw err;
-        });
+        if (rows.length === 1) {
+            setUserPassword(rows[0].username, newPassword);
+            sql = `DELETE FROM passwordReset WHERE resetid = ?`;
+            mainDB.execute(sql, params, (err, rows) => {
+                if (err) throw err;
+            });
+        }
     });
 }
 
@@ -743,9 +795,11 @@ module.exports = {
     'getUserImage': getUserImage,
     'setUserImage': setUserImage,
     'userExists': userExists,
+    'getUserInfo': getUserInfo,
     'addFriend': addFriend,
     'removeFriend': removeFriend,
     'getFriends': getFriends,
+    'checkIsFriend': checkIsFriend,
     'getIncomingFriendRequests': getIncomingFriendRequests,
     'acceptIncomingFriendRequest': acceptIncomingFriendRequest,
     'removeIncomingFriendRequest': removeIncomingFriendRequest,
@@ -753,6 +807,7 @@ module.exports = {
     'newOutgoingFriendRequest': newOutgoingFriendRequest,
     'removeOutgoingFriendRequest': removeOutgoingFriendRequest,
     'getDMRoomID': getDMRoomID,
+    'getOtherDMMemberUsername': getOtherDMMemberUsername,
     'createRoom': createRoom,
     'deleteRoom': deleteRoom,
     'addToRoom': addToRoom,

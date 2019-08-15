@@ -138,14 +138,18 @@ function addNewFriend(parentElement, friendData) {
     var friendName = document.createElement('span');
     friendName.innerHTML = friendData.displayname;
     newFriend.appendChild(friendName);
-    var friendMessage = document.createElement('button');
-    friendMessage.innerHTML = 'Message';
-    friendMessage.setAttribute('onclick', `openFriendDM('${friendData.username}');`);
-    newFriend.appendChild(friendMessage);
     var friendRemove = document.createElement('button');
     friendRemove.innerHTML = 'Remove';
     friendRemove.setAttribute('onclick', `removeFriend('${friendData.username}');`);
     newFriend.appendChild(friendRemove);
+    var friendMessage = document.createElement('button');
+    friendMessage.innerHTML = 'Message';
+    friendMessage.setAttribute('onclick', `openFriendDM('${friendData.username}');`);
+    newFriend.appendChild(friendMessage);
+    var friendProfile = document.createElement('button');
+    friendProfile.innerHTML = 'Profile';
+    friendProfile.setAttribute('onclick', `viewProfile('${friendData.username}');`);
+    newFriend.appendChild(friendProfile);
     parentElement.appendChild(newFriend);
 }
 

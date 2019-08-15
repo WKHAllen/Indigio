@@ -46,6 +46,15 @@ function openRoom(roomid) {
     window.location.replace(newURL.href);
 }
 
+function viewProfileByRoomID(roomid) {
+    socket.emit('getOtherDMMemberUsername', { 'roomid': roomid });
+    socket.on('returnOtherDMMemberUsername', (data) => {
+        var newURL = new URL(window.location.origin + '/profile');
+        newURL.searchParams.set('username', data.username);
+        window.location.replace(newURL.href);
+    });
+}
+
 function buildRoom(roomData) {
     var newRoom = document.createElement('li');
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
@@ -58,7 +67,12 @@ function buildRoom(roomData) {
     var roomName = document.createElement('span');
     roomName.innerHTML = roomData.name;
     newRoom.appendChild(roomName);
-    if (roomData.roomType !== dmRoomType) {
+    if (roomData.roomType === dmRoomType) {
+        newRoom.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            viewProfileByRoomID(roomData.id);
+        });
+    } else {
         newRoom.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             var newURL = new URL(window.location.origin + '/manage-room');
