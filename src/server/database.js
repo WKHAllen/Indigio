@@ -80,7 +80,14 @@ function init() {
             createTimestamp INT NOT NULL
         );
     `;
-    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable], (err, rows) => {
+    var blockedUsersTable = `
+        CREATE TABLE IF NOT EXISTS blockedUsers (
+            id1 INT NOT NULL,
+            id2 INT NOT NULL,
+            blockTimestamp INT NOT NULL
+        );
+    `;
+    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable, blockedUsersTable], (err, rows) => {
         if (err) throw err;
     });
 }
@@ -170,6 +177,64 @@ function getUserInfo(username, callback) {
             else
                 callback(null);
         }
+    });
+}
+
+function isBlocked(username1, username2, callback) {
+    var sql = `
+        SELECT id1, id2 FROM blockedUsers WHERE id1 = (
+            SELECT id FROM users WHERE username = ?
+        ) AND id2 = (
+            SELECT id FROM users WHERE username = ?
+        );`;
+    var params = [username1, username2];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
+    });
+}
+
+function blockUser(username1, username2) {
+    isBlocked(username1, username2, (res) => {
+        if (!res) {
+            var sql = `
+                INSERT INTO blockedUsers (id1, id2, blockTimestamp) VALUES (
+                    (SELECT id FROM users WHERE username = ?),
+                    (SELECT id FROM users WHERE username = ?),
+                    ?
+                );`;
+            var params = [username1, username2, getTime()];
+            mainDB.execute(sql, params, (err, rows) => {
+                if (err) throw err;
+            });
+        }
+    });
+}
+
+function unblockUser(username1, username2) {
+    var sql = `
+        DELETE FROM blockedUsers WHERE id1 = (
+            SELECT id FROM users WHERE username = ?
+        ) AND id2 = (
+            SELECT id FROM users WHERE username = ?
+        );`;
+    var params = [username1, username2];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
+function getBlockedUsers(username, callback) {
+    var sql = `
+        SELECT username, displayname, imageURL FROM users JOIN (
+            SELECT id2 FROM blockedUsers WHERE id1 = (
+                SELECT id FROM users WHERE username = ?
+            )
+        ) blockedUsers1 ON users.id = blockedUsers1.id2;`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows);
     });
 }
 
@@ -376,7 +441,12 @@ function getDMRoomID(username1, username2, callback) {
     var params = [username1, username2, dmRoomType];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback) callback(rows);
+        if (callback) {
+            if (rows.length > 0)
+                callback(rows[0].roomid);
+            else
+                callback(null);
+        }
     });
 }
 
@@ -392,7 +462,12 @@ function getOtherDMMemberUsername(roomID, username, callback) {
     var params = [roomID, username, roomID, dmRoomType];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback && rows.length === 1) callback(rows[0].username);
+        if (callback) {
+            if (rows.length > 0)
+                callback(rows[0].username);
+            else
+                callback(null);
+        }
     });
 }
 
@@ -798,6 +873,10 @@ module.exports = {
     'setUserImage': setUserImage,
     'userExists': userExists,
     'getUserInfo': getUserInfo,
+    'isBlocked': isBlocked,
+    'blockUser': blockUser,
+    'unblockUser': unblockUser,
+    'getBlockedUsers': getBlockedUsers,
     'addFriend': addFriend,
     'removeFriend': removeFriend,
     'getFriends': getFriends,

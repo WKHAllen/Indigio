@@ -98,15 +98,15 @@ function removeOutgoingFriendRequest(username, data) {
 }
 
 function getDMRoomID(socket, username, data) {
-    database.getDMRoomID(username, data.username, (rooms) => {
-        if (rooms.length === 0) {
-            database.createRoom(username, database.dmRoomType, `${username}, ${data.username}`, (roomid) => {
-                database.addToRoom(roomid, username);
-                database.addToRoom(roomid, data.username);
-                socket.emit('returnDMRoomID', { 'roomid': roomid });
+    database.getDMRoomID(username, data.username, (roomid) => {
+        if (roomid === null) {
+            database.createRoom(username, database.dmRoomType, `${username}, ${data.username}`, (newRoomid) => {
+                database.addToRoom(newRoomid, username);
+                database.addToRoom(newRoomid, data.username);
+                socket.emit('returnDMRoomID', { 'roomid': newRoomid });
             });
         } else {
-            socket.emit('returnDMRoomID', { 'roomid': rooms[0].roomid });
+            socket.emit('returnDMRoomID', { 'roomid': roomid });
         }
     });
 }
@@ -140,8 +140,25 @@ function getDMImage(socket, username, data) {
 function getMessages(socket, username, data) {
     database.userInRoom(username, data.roomid, (res) => {
         if (res) {
-            database.getMessages(data.roomid, data.size, (data) => {
-                socket.emit('returnMessages', data);
+            database.getRoomType(data.roomid, (roomType) => {
+                if (roomType === database.normalRoomType) {
+                    database.getMessages(data.roomid, data.size, (data) => {
+                        socket.emit('returnMessages', { 'messages': data, 'blocked': false });
+                    });
+                } else if (roomType === database.dmRoomType) {
+                    database.getOtherDMMemberUsername(data.roomid, username, (otherUsername) => {
+                        database.isBlocked(username, otherUsername, (blocked1) => {
+                            database.isBlocked(otherUsername, username, (blocked2) => {
+                                database.getMessages(data.roomid, data.size, (data) => {
+                                    if (blocked1 || blocked2)
+                                        socket.emit('returnMessages', { 'messages': data, 'blocked': true });
+                                    else
+                                        socket.emit('returnMessages', { 'messages': data, 'blocked': false });
+                                });
+                            });
+                        });
+                    });
+                }
             });
         }
     });
@@ -160,12 +177,34 @@ function getMoreMessages(socket, username, data) {
 function newMessage(username, data) {
     database.userInRoom(username, data.roomid, (res) => {
         if (res) {
-            database.createMessage(data.text, username, data.roomid);
-            var now = getTime();
-            database.getUserDisplayname(username, (displayname) => {
-                database.getUserImage(username, (image) => {
-                    io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
-                });
+            database.getRoomType(data.roomid, (roomType) => {
+                if (roomType === database.normalRoomType) {
+                    database.createMessage(data.text, username, data.roomid);
+                    var now = getTime();
+                    database.getUserDisplayname(username, (displayname) => {
+                        database.getUserImage(username, (image) => {
+                            io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                        });
+                    });
+                } else if (roomType === database.dmRoomType) {
+                    database.getOtherDMMemberUsername(data.roomid, username, (otherUsername) => {
+                        database.isBlocked(username, otherUsername, (res) => {
+                            if (!res) {
+                                database.isBlocked(otherUsername, username, (res) => {
+                                    if (!res) {
+                                        database.createMessage(data.text, username, data.roomid);
+                                        var now = getTime();
+                                        database.getUserDisplayname(username, (displayname) => {
+                                            database.getUserImage(username, (image) => {
+                                                io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
             });
         }
     });
@@ -307,19 +346,27 @@ function getRoomMembers(socket, username, data) {
 }
 
 function addRoomMember(username, data) {
-    database.userInRoom(username, data.roomid, (res) => {
-        if (res) {
-            database.userExists(data.memberUsername, (res) => {
-                if (res) {
-                    database.addToRoom(data.roomid, data.memberUsername);
-                    if (userSockets.has(data.memberUsername)) {
-                        if (!userRooms.has(data.roomid))
-                            userRooms.set(data.roomid, new Map());
-                        userRooms.get(data.roomid).set(data.memberUsername, userSockets.get(data.memberUsername));
-                        database.getRoomInfo(data.roomid, (roomData) => {
-                            userSockets.get(data.memberUsername).emit('roomJoin', { 'id': roomData.id, 'roomType': roomData.roomType, 'updateTimestamp': roomData.updateTimestamp, 'name': roomData.name, 'imageURL': roomData.imageURL });
-                        });
-                    }
+    database.isBlocked(username, data.memberUsername, (res) => {
+        if (!res) {
+            database.isBlocked(data.memberUsername, username, (res) => {
+                if (!res) {
+                    database.userInRoom(username, data.roomid, (res) => {
+                        if (res) {
+                            database.userExists(data.memberUsername, (res) => {
+                                if (res) {
+                                    database.addToRoom(data.roomid, data.memberUsername);
+                                    if (userSockets.has(data.memberUsername)) {
+                                        if (!userRooms.has(data.roomid))
+                                            userRooms.set(data.roomid, new Map());
+                                        userRooms.get(data.roomid).set(data.memberUsername, userSockets.get(data.memberUsername));
+                                        database.getRoomInfo(data.roomid, (roomData) => {
+                                            userSockets.get(data.memberUsername).emit('roomJoin', { 'id': roomData.id, 'roomType': roomData.roomType, 'updateTimestamp': roomData.updateTimestamp, 'name': roomData.name, 'imageURL': roomData.imageURL });
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -335,6 +382,38 @@ function getOtherDMMemberUsername(socket, username, data) {
 function checkIsFriend(socket, username, data) {
     database.checkIsFriend(username, data.username, (res) => {
         socket.emit('isFriend', { 'res': res });
+    });
+}
+
+function checkIsBlocked(socket, username, data) {
+    database.isBlocked(username, data.username, (res) => {
+        socket.emit('isBlocked', { 'res': res });
+    });
+}
+
+function blockUser(username, data) {
+    database.blockUser(username, data.username);
+    if (userSockets.has(data.username)) {
+        database.getDMRoomID(username, data.username, (roomid) => {
+            userSockets.get(data.username).emit('blocked', { 'roomid': roomid });
+        });
+    }
+}
+
+function unblockUser(username, data) {
+    database.unblockUser(username, data.username);
+    database.isBlocked(data.username, username, (res) => {
+        if (!res && userSockets.has(data.username)) {
+            database.getDMRoomID(username, data.username, (roomid) => {
+                userSockets.get(data.username).emit('unblocked', { 'roomid': roomid });
+            });
+        }
+    });
+}
+
+function getBlockedUsers(socket, username) {
+    database.getBlockedUsers(username, (data) => {
+        socket.emit('returnBlockedUsers', data);
     });
 }
 
@@ -372,6 +451,10 @@ function main(socket, username) {
     socket.on('addRoomMember', (data) => { addRoomMember(username, data); });
     socket.on('getOtherDMMemberUsername', (data) => { getOtherDMMemberUsername(socket, username, data); });
     socket.on('checkIsFriend', (data) => { checkIsFriend(socket, username, data); });
+    socket.on('checkIsBlocked', (data) => { checkIsBlocked(socket, username, data); });
+    socket.on('blockUser', (data) => { blockUser(username, data); });
+    socket.on('unblockUser', (data) => { unblockUser(username, data); });
+    socket.on('getBlockedUsers', () => { getBlockedUsers(socket, username); });
 }
 
 function register(socket, data) {

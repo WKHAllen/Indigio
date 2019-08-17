@@ -637,6 +637,10 @@ a:focus {
     width: calc(100% - var(--room-li-height) - var(--friend-button-width));
 }
 
+#blocked-users li span {
+    width: calc(100% - var(--room-li-height) - var(--friend-button-width));
+}
+
 #room-members-list li span {
     width: calc(100% - var(--room-li-height) - var(--friend-button-width));
 }

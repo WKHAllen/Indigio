@@ -31,6 +31,34 @@ function removeFriend() {
     });
 }
 
+function blockUser() {
+    var socket = io.connect(url, { secure: true });
+    socket.emit('login', { 'username': username, 'password': password });
+    socket.on('validLogin', (data) => {
+        if (data.res) {
+            socket.emit('blockUser', { 'username': profileUsername });
+            socket.disconnect();
+            window.location.reload();
+        } else {
+            socket.disconnect();
+        }
+    });
+}
+
+function unblockUser() {
+    var socket = io.connect(url, { secure: true });
+    socket.emit('login', { 'username': username, 'password': password });
+    socket.on('validLogin', (data) => {
+        if (data.res) {
+            socket.emit('unblockUser', { 'username': profileUsername });
+            socket.disconnect();
+            window.location.reload();
+        } else {
+            socket.disconnect();
+        }
+    });
+}
+
 function main() {
     document.getElementById('title-username').innerHTML = `${profileUsername}'s `;
     var socket = io.connect(url, { secure: true });
@@ -41,27 +69,37 @@ function main() {
             document.getElementById('displayname-label').innerHTML = data.displayname;
             document.getElementById('image-label').innerHTML = `<img src="${data.imageURL}" width="32" height="32">`;
             document.getElementById('image-url-label').innerHTML = data.imageURL;
+            if (profileUsername !== username) {
+                socket.emit('login', { 'username': username, 'password': password });
+                socket.on('validLogin', (data) => {
+                    if (data.res) {
+                        socket.emit('checkIsFriend', { 'username': profileUsername });
+                        socket.on('isFriend', (data) => {
+                            if (data.res) {
+                                var addFriendButton = document.getElementById('add-friend-button');
+                                addFriendButton.innerHTML = 'Remove friend';
+                                addFriendButton.setAttribute('onclick', 'removeFriend();');
+                            }
+                            document.getElementById('add-friend').classList.remove('invisible');
+                            socket.emit('checkIsBlocked', { 'username': profileUsername });
+                            socket.on('isBlocked', (data) => {
+                                if (data.res) {
+                                    var blockUserButton = document.getElementById('block-user-button');
+                                    blockUserButton.innerHTML = 'Unblock';
+                                    blockUserButton.setAttribute('onclick', 'unblockUser();');
+                                }
+                                document.getElementById('block-user').classList.remove('invisible');
+                                socket.disconnect();
+                            });
+                        });
+                    } else {
+                        socket.disconnect();
+                    }
+                });
+            }
         } else {
             document.getElementsByClassName('middle-content')[0].innerHTML = 'This user does not exist.';
-        }
-        if (profileUsername !== username) {
-            socket.emit('login', { 'username': username, 'password': password });
-            socket.on('validLogin', (data) => {
-                if (data.res) {
-                    socket.emit('checkIsFriend', { 'username': profileUsername });
-                    socket.on('isFriend', (data) => {
-                        if (data.res) {
-                            var addFriendButton = document.getElementById('add-friend-button');
-                            addFriendButton.innerHTML = 'Remove friend';
-                            addFriendButton.setAttribute('onclick', 'removeFriend();');
-                        }
-                        document.getElementById('add-friend').classList.remove('invisible');
-                        socket.disconnect();
-                    });
-                } else {
-                    socket.disconnect();
-                }
-            });
+            socket.disconnect();
         }
     });
 }

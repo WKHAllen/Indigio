@@ -21,10 +21,10 @@ function createWindow() {
         darkTheme: true,
         webPreferences: {
             nodeIntegration: true,
-            devTools: true
+            devTools: false
         }
     });
-    // win.removeMenu();
+    win.removeMenu();
     win.loadURL('http://localhost:3000');
     win.on('closed', () => {
         win = null

@@ -1,3 +1,6 @@
+if (username === null || password === null)
+    window.location.replace('/login/');
+
 function addFriend() {
     var socket = io.connect(url, { secure: true });
     socket.emit('login', { 'username': username, 'password': password });
@@ -111,6 +114,20 @@ function removeFriend(friendUsername) {
     });
 }
 
+function unblockUser(blockedUsername) {
+    var socket = io.connect(url, { secure: true });
+    socket.emit('login', { 'username': username, 'password': password });
+    socket.on('validLogin', (data) => {
+        if (data.res) {
+            socket.emit('unblockUser', { 'username': blockedUsername });
+            socket.disconnect();
+            window.location.reload();
+        } else {
+            socket.disconnect();
+        }
+    });
+}
+
 function addNewSearchResult(parentElement, friendData) {
     var newFriend = document.createElement('li');
     var friendImage = document.createElement('img');
@@ -187,6 +204,21 @@ function addNewOutgoingFriend(parentElement, friendData) {
     parentElement.appendChild(newFriend);
 }
 
+function addNewBlockedUser(parentElement, userData) {
+    var newBlockedUser = document.createElement('li');
+    var blockedUserImage = document.createElement('img');
+    blockedUserImage.setAttribute('src', userData.imageURL);
+    newBlockedUser.appendChild(blockedUserImage);
+    var blockedUserName = document.createElement('span');
+    blockedUserName.innerHTML = userData.displayname;
+    newBlockedUser.appendChild(blockedUserName);
+    var blockedUserUnblock = document.createElement('button');
+    blockedUserUnblock.innerHTML = 'Unblock';
+    blockedUserUnblock.setAttribute('onclick', `unblockUser('${userData.username}');`);
+    newBlockedUser.appendChild(blockedUserUnblock);
+    parentElement.appendChild(newBlockedUser);
+}
+
 function populateFriends() {
     var socket = io.connect(url, { secure: true });
     socket.emit('login', { 'username': username, 'password': password });
@@ -226,7 +258,19 @@ function populateFriends() {
                         for (var friend of data) {
                             addNewOutgoingFriend(friendsOutgoing, friend);
                         }
-                        socket.disconnect();
+                        // get blocked users
+                        socket.emit('getBlockedUsers');
+                        socket.on('returnBlockedUsers', (data) => {
+                            var blockedUsers = document.getElementById('blocked-users');
+                            if (data.length === 0)
+                                blockedUsers.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                            else
+                                blockedUsers.getElementsByClassName('loading')[0].innerHTML = '';
+                            for (var user of data) {
+                                addNewBlockedUser(blockedUsers, user);
+                            }
+                            socket.disconnect();
+                        });
                     });
                 });
             });
@@ -238,6 +282,3 @@ function populateFriends() {
 }
 
 window.addEventListener('load', populateFriends);
-
-if (username === null || password === null)
-    window.location.replace('/login/');

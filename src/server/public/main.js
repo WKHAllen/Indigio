@@ -191,8 +191,12 @@ function main() {
         messagesDiv.getElementsByClassName('loading')[0].classList.add('invisible');
         socket.emit('getMessages', { 'roomid': roomID, 'size': messageGroupSize });
         socket.on('returnMessages', (data) => {
+            if (data.blocked) {
+                mainInput.setAttribute('disabled', '');
+                mainInput.setAttribute('placeholder', 'Blocked');
+            }
             loadedMessages = messageGroupSize;
-            for (var message of data) {
+            for (var message of data.messages) {
                 addNewMessage(messagesDiv, message);
             }
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -220,6 +224,18 @@ function main() {
         });
         socket.on('roomKick', (roomData) => {
             removeRoom(roomData.roomid);
+        });
+        socket.on('blocked', (data) => {
+            if (data.roomid === roomID) {
+                mainInput.setAttribute('disabled', '');
+                mainInput.setAttribute('placeholder', 'Blocked');
+            }
+        });
+        socket.on('unblocked', (data) => {
+            if (data.roomid === roomID) {
+                mainInput.removeAttribute('disabled');
+                mainInput.removeAttribute('placeholder');
+            }
         });
     });
 }
