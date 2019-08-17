@@ -6,7 +6,7 @@ function addFriend() {
             var friendUsername = stripWhitespace(document.getElementById('add-friend').value);
             socket.emit('addFriend', { 'username': friendUsername });
             socket.disconnect();
-            location.reload();
+            window.location.reload();
         } else {
             socket.disconnect();
         }
@@ -47,7 +47,7 @@ function openFriendDM(friendUsername) {
             socket.emit('getDMRoomID', { 'username': friendUsername });
             socket.on('returnDMRoomID', (data) => {
                 socket.disconnect();
-                window.location.replace(`../?roomid=${data.roomid}`);
+                window.location.replace(`/?roomid=${data.roomid}`);
             });
         } else {
             socket.disconnect();
@@ -62,7 +62,7 @@ function acceptFriendRequest(friendUsername) {
         if (data.res) {
             socket.emit('acceptIncomingFriendRequest', { 'username': friendUsername });
             socket.disconnect();
-            location.reload();
+            window.location.reload();
         } else {
             socket.disconnect();
         }
@@ -76,7 +76,7 @@ function denyFriendRequest(friendUsername) {
         if (data.res) {
             socket.emit('removeIncomingFriendRequest', { 'username': friendUsername });
             socket.disconnect();
-            location.reload();
+            window.location.reload();
         } else {
             socket.disconnect();
         }
@@ -90,7 +90,7 @@ function cancelFriendRequest(friendUsername) {
         if (data.res) {
             socket.emit('removeOutgoingFriendRequest', { 'username': friendUsername });
             socket.disconnect();
-            location.reload();
+            window.location.reload();
         } else {
             socket.disconnect();
         }
@@ -104,7 +104,7 @@ function removeFriend(friendUsername) {
         if (data.res) {
             socket.emit('removeFriend', { 'username': friendUsername });
             socket.disconnect();
-            location.reload();
+            window.location.reload();
         } else {
             socket.disconnect();
         }
@@ -232,7 +232,7 @@ function populateFriends() {
             });
         } else {
             socket.disconnect();
-            window.location.replace('../login/');
+            window.location.replace('/login/');
         }
     });
 }
@@ -240,4 +240,4 @@ function populateFriends() {
 window.addEventListener('load', populateFriends);
 
 if (username === null || password === null)
-    window.location.replace('../login/');
+    window.location.replace('/login/');

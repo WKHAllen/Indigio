@@ -43,7 +43,7 @@ function reset() {
     socket.on('validPasswordReset', (data) => {
         if (data.res) {
             socket.disconnect();
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             showError('Email address is not registered');
             document.getElementById('reset-button').disabled = false;
@@ -67,7 +67,7 @@ function passwordReset() {
         if (data.res) {
             socket.emit('resetPassword', { 'newPassword': password });
             socket.disconnect();
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             socket.disconnect();
         }

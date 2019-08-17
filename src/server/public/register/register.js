@@ -70,7 +70,7 @@ function register() {
         if (data.res) {
             localStorage.setItem(localUsername, username);
             localStorage.setItem(localPassword, password);
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             showError('Username or email address is already in use');
             document.getElementById('register-button').disabled = false;

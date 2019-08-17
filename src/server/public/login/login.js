@@ -24,7 +24,7 @@ function login() {
         if (data.res) {
             localStorage.setItem(localUsername, data.username);
             localStorage.setItem(localPassword, password);
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             showError('Error: login is invalid.');
             document.getElementById('login-button').disabled = false;

@@ -77,7 +77,7 @@ function leaveRoom() {
         if (data.res) {
             socket.emit('leaveRoom', { 'roomid': roomID });
             socket.disconnect();
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             socket.disconnect();
         }
@@ -92,7 +92,7 @@ function deleteRoom() {
         if (data.res) {
             socket.emit('deleteRoom', { 'roomid': roomID });
             socket.disconnect();
-            window.location.replace('..');
+            window.location.replace('/');
         } else {
             socket.disconnect();
         }
@@ -175,12 +175,12 @@ function populateOptions() {
                     });
                 } else {
                     socket.disconnect();
-                    window.location.replace('..');
+                    window.location.replace('/');
                 }
             });
         } else {
             socket.disconnect();
-            window.location.replace('../login/');
+            window.location.replace('/login/');
         }
     });
 }
@@ -188,4 +188,4 @@ function populateOptions() {
 window.addEventListener('load', populateOptions);
 
 if (username === null || password === null)
-    window.location.replace('../login/');
+    window.location.replace('/login/');

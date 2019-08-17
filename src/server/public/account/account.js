@@ -109,7 +109,7 @@ function populateOptions() {
             });
         } else {
             socket.disconnect();
-            window.location.replace('../login/');
+            window.location.replace('/login/');
         }
     });
 }
@@ -117,4 +117,4 @@ function populateOptions() {
 window.addEventListener('load', populateOptions);
 
 if (username === null || password === null)
-    window.location.replace('../login/');
+    window.location.replace('/login/');
