@@ -89,6 +89,8 @@ function addNewRoom(parentElement, roomData) {
 }
 
 function addNewRoomAbove(parentElement, roomData) {
+    parentElement.getElementsByClassName('loading')[0].classList.add('invisible');
+    parentElement.getElementsByClassName('loading')[0].parentElement.classList.remove('space-above');
     var newRoom = buildRoom(roomData);
     parentElement.insertBefore(newRoom, parentElement.children[1]);
 }
@@ -164,16 +166,7 @@ function main() {
     mainInput.setAttribute('onkeydown', 'onEnter();');
     socket.emit('getRooms');
     socket.on('returnRooms', (data) => {
-        var createRoomButton = document.getElementById('create-room-button');
-        createRoomButton.removeAttribute('disabled');
-        var roomList = document.getElementById('room-list');
-        var messageDiv = document.getElementById('messages');
-        if (data.length === 0) {
-            roomList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
-            messageDiv.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
-        } else {
-            roomList.getElementsByClassName('loading')[0].classList.add('invisible');
-            roomList.getElementsByClassName('loading')[0].parentElement.classList.remove('space-above');
+        if (data.length > 0) {
             if (roomID === null) {
                 openRoom(data[0].id);
                 return;
@@ -186,6 +179,11 @@ function main() {
                 return;
             }
         }
+        var createRoomButton = document.getElementById('create-room-button');
+        createRoomButton.classList.remove('invisible');
+        var roomList = document.getElementById('room-list');
+        roomList.getElementsByClassName('loading')[0].classList.add('invisible');
+        roomList.getElementsByClassName('loading')[0].parentElement.classList.remove('space-above');
         for (var room of data) {
             addNewRoom(roomList, room, socket);
         }

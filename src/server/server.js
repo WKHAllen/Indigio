@@ -7,22 +7,18 @@ const passwordReset = require('./passwordReset.js');
 
 var app = express();
 const publicDir = 'public';
-const errorDir = path.join(publicDir, 'errors');
+const errorDir = path.join(__dirname, publicDir, 'errors');
 var server = http.Server(app);
 var io = sio(server);
+var host = process.env.HOST || 'localhost';
 var port = process.env.PORT || 3000;
-server.listen(port);
+server.listen(port, host, () => {
+    console.log(`Server running on ${host}:${port}`);
+});
 
-var serverAddress = server.address();
-var host = serverAddress.address;
-var port = serverAddress.port;
-if (host === '::') host = 'localhost';
-if (port === 80) port = '';
 var address;
-if (port) address = 'http://' + host + ':' + port;
+if (port !== 80) address = 'http://' + host + ':' + port;
 else address = 'http://' + host;
-
-console.log(`Server running on ${address}`);
 
 var userSockets = new Map();
 var userSocketsReversed = new Map();
@@ -179,7 +175,7 @@ function createRoom(socket, username) {
     database.createRoom(username, database.normalRoomType, database.defaultRoomName, (roomid) => {
         database.addToRoom(roomid, username, () => {
             var now = getTime();
-            socket.emit('newRoom', { 'id': roomid, 'roomType': database.normalRoomType, 'updateTimestamp': now, 'name': database.defaultRoomName, 'imageURL': null });
+            socket.emit('newRoom', { 'id': roomid, 'roomType': database.normalRoomType, 'updateTimestamp': now, 'name': database.defaultRoomName, 'imageURL': database.defaultRoomImageURL });
             socket.join(roomid.toString());
             userRooms.set(roomid, new Map());
             userRooms.get(roomid).set(username, socket);

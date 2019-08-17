@@ -27,20 +27,28 @@ function setImage() {
     var status = document.getElementById('image-status');
     status.style.color = 'var(--primary-text-color)';
     status.innerHTML = 'Changing image URL...';
-    var socket = io.connect(url, { secure: true });
-    socket.emit('login', { 'username': username, 'password': password });
-    socket.on('validLogin', (data) => {
-        if (data.res) {
-            socket.emit('setImage', { 'image': image });
-            status.style.color = 'var(--success-text-color)';
-            status.innerHTML = 'Image URL change successful';
-            document.getElementById('image-label').innerHTML = `<img src="${image}" width="32" height="32">`;
+    validImageURL(image, (res) => {
+        if (res) {
+            var socket = io.connect(url, { secure: true });
+            socket.emit('login', { 'username': username, 'password': password });
+            socket.on('validLogin', (data) => {
+                if (data.res) {
+                    socket.emit('setImage', { 'image': image });
+                    status.style.color = 'var(--success-text-color)';
+                    status.innerHTML = 'Image URL change successful';
+                    document.getElementById('image-label').innerHTML = `<img src="${image}" width="32" height="32">`;
+                } else {
+                    status.style.color = 'var(--error-text-color)';
+                    status.innerHTML = 'Failed to change image URL';
+                }
+                document.getElementById('image-button').disabled = false;
+                socket.disconnect();
+            });
         } else {
             status.style.color = 'var(--error-text-color)';
-            status.innerHTML = 'Failed to change image URL';
+            status.innerHTML = 'Invalid URL';
+            document.getElementById('image-button').disabled = false;
         }
-        document.getElementById('image-button').disabled = false;
-        socket.disconnect();
     });
 }
 

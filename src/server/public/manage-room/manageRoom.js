@@ -29,20 +29,28 @@ function setRoomImage() {
     var status = document.getElementById('room-image-status');
     status.style.color = 'var(--primary-text-color)';
     status.innerHTML = 'Changing room image URL...';
-    var socket = io.connect(url, { secure: true });
-    socket.emit('login', { 'username': username, 'password': password });
-    socket.on('validLogin', (data) => {
-        if (data.res) {
-            socket.emit('setRoomImage', { 'roomid': roomID, 'roomImage': roomImage });
-            status.style.color = 'var(--success-text-color)';
-            status.innerHTML = 'Room image URL change successful';
-            document.getElementById('room-image-label').innerHTML = `<img src="${roomImage}" width="32" height="32">`;
+    validImageURL(roomImage, (res) => {
+        if (res) {
+            var socket = io.connect(url, { secure: true });
+            socket.emit('login', { 'username': username, 'password': password });
+            socket.on('validLogin', (data) => {
+                if (data.res) {
+                    socket.emit('setRoomImage', { 'roomid': roomID, 'roomImage': roomImage });
+                    status.style.color = 'var(--success-text-color)';
+                    status.innerHTML = 'Room image URL change successful';
+                    document.getElementById('room-image-label').innerHTML = `<img src="${roomImage}" width="32" height="32">`;
+                } else {
+                    status.style.color = 'var(--error-text-color)';
+                    status.innerHTML = 'Failed to change room image URL';
+                }
+                document.getElementById('room-image-button').disabled = false;
+                socket.disconnect();
+            });
         } else {
             status.style.color = 'var(--error-text-color)';
-            status.innerHTML = 'Failed to change room image URL';
+            status.innerHTML = 'Invalid URL';
+            document.getElementById('room-image-button').disabled = false;
         }
-        document.getElementById('room-image-button').disabled = false;
-        socket.disconnect();
     });
 }
 

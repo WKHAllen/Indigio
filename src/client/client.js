@@ -16,7 +16,7 @@ function createWindow() {
         center: true,
         frame: false,
         title: 'Indigio',
-        icon: path.join(__dirname, assetsDir, 'icon.ico'),
+        icon: path.join(__dirname, assetsDir, 'favicon.ico'),
         backgroundColor: '#001f4f',
         darkTheme: true,
         webPreferences: {

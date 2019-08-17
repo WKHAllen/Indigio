@@ -3,15 +3,16 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const db = require('./db.js');
 
-const dbDir = 'db';
-const dbFile = path.join(dbDir, 'main.db');
+const dbFile = path.join(__dirname, 'db', 'main.db');
 const saltRounds = 14;
 const dmRoomType = 0;
 const normalRoomType = 1;
 const defaultRoomName = 'New room';
+const defaultUserImageURL = '/assets/userDefault.ico';
+const defaultRoomImageURL = '/assets/roomDefault.ico';
 const hexLength = 64;
 
-var mainDB = new db.DB(path.join(__dirname, dbFile));
+var mainDB = new db.DB(dbFile);
 
 function getTime() {
     return Math.floor(new Date().getTime() / 1000);
@@ -94,8 +95,8 @@ function createUser(username, displayname, email, password, callback) {
         } else {
             bcrypt.hash(password, saltRounds, (err, hash) => {
                 if (err) throw err;
-                sql = `INSERT INTO users (username, displayname, email, password, joinTimestamp) VALUES (?, ?, ?, ?, ?);`;
-                params = [username, displayname, email, hash, getTime()];
+                sql = `INSERT INTO users (username, displayname, email, password, imageURL, joinTimestamp) VALUES (?, ?, ?, ?, ?, ?);`;
+                params = [username, displayname, email, hash, defaultUserImageURL, getTime()];
                 mainDB.execute(sql, params, (err, rows) => {
                     if (err) throw err;
                     if (callback) callback(true);
@@ -398,16 +399,17 @@ function getOtherDMMemberUsername(roomID, username, callback) {
 function createRoom(creatorUsername, roomType, name, callback) {
     var sql = `
         INSERT INTO rooms (
-            creatorid, roomType, name, createTimestamp, updateTimestamp
+            creatorid, roomType, name, imageURL, createTimestamp, updateTimestamp
         ) VALUES (
             (SELECT id FROM users WHERE username = ?),
-            ?, 
-            ?, 
+            ?,
+            ?,
+            ?,
             ?,
             ?
         );`;
     var now = getTime();
-    var params = [creatorUsername, roomType, name, now, now];
+    var params = [creatorUsername, roomType, name, defaultRoomImageURL, now, now];
     var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
     mainDB.executeAfter(sql, params, (err, rows) => {
         if (err) throw err;
@@ -836,7 +838,9 @@ module.exports = {
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType,
     'normalRoomType': normalRoomType,
-    'defaultRoomName': defaultRoomName
+    'defaultRoomName': defaultRoomName,
+    'defaultUserImageURL': defaultUserImageURL,
+    'defaultRoomImageURL': defaultRoomImageURL
 };
 
 init();

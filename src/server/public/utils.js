@@ -69,3 +69,25 @@ function viewProfile(theUsername) {
     newURL.searchParams.set('username', theUsername);
     window.location.replace(newURL.href);
 }
+
+function isImage(imageURL) {
+    return imageURL.match(/\.(jpeg|jpg|gif|png|ico)$/) != null;
+}
+
+function validImageURL(imageURL, callback) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState === 4) {
+            if (this.status === 200 || this.status === 0) {
+                if (isImage(imageURL))
+                    callback(true);
+                else
+                    callback(false);
+            } else {
+                callback(false);
+            }
+        }
+    };
+    xhttp.open('GET', imageURL, true);
+    xhttp.send();
+}
