@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const db = require('./db.js');
 
 const dbFile = path.join(__dirname, 'db', 'main.db');
-const saltRounds = 14;
+const saltRounds = 12;
 const dmRoomType = 0;
 const normalRoomType = 1;
 const defaultRoomName = 'New room';
