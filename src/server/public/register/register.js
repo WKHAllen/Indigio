@@ -1,6 +1,6 @@
 function showError(msg) {
     var errorText = document.getElementById('error-text');
-    errorText.innerHTML = msg;
+    errorText.innerText = msg;
     errorText.classList.remove('invisible');
 }
 

@@ -32,7 +32,7 @@ function searchFriends() {
     var statusLabel = searchResultsList.getElementsByClassName('loading')[0];
     var results = doSearch(friendUsername);
     if (results.length === 0) {
-        statusLabel.innerHTML = 'Nothing here';
+        statusLabel.innerText = 'Nothing here';
         statusLabel.classList.remove('invisible');
     } else {
         searchResultsList.getElementsByClassName('loading')[0].classList.add('invisible');
@@ -134,14 +134,14 @@ function addNewSearchResult(parentElement, friendData) {
     friendImage.setAttribute('src', friendData.imageURL);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
-    friendName.innerHTML = friendData.displayname;
+    friendName.innerText = friendData.displayname;
     newFriend.appendChild(friendName);
     var friendMessage = document.createElement('button');
-    friendMessage.innerHTML = 'Message';
+    friendMessage.innerText = 'Message';
     friendMessage.setAttribute('onclick', `openFriendDM('${friendData.username}');`);
     newFriend.appendChild(friendMessage);
     var friendRemove = document.createElement('button');
-    friendRemove.innerHTML = 'Remove';
+    friendRemove.innerText = 'Remove';
     friendRemove.setAttribute('onclick', `removeFriend('${friendData.username}');`);
     newFriend.appendChild(friendRemove);
     parentElement.appendChild(newFriend);
@@ -153,18 +153,18 @@ function addNewFriend(parentElement, friendData) {
     friendImage.setAttribute('src', friendData.imageURL);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
-    friendName.innerHTML = friendData.displayname;
+    friendName.innerText = friendData.displayname;
     newFriend.appendChild(friendName);
     var friendRemove = document.createElement('button');
-    friendRemove.innerHTML = 'Remove';
+    friendRemove.innerText = 'Remove';
     friendRemove.setAttribute('onclick', `removeFriend('${friendData.username}');`);
     newFriend.appendChild(friendRemove);
     var friendMessage = document.createElement('button');
-    friendMessage.innerHTML = 'Message';
+    friendMessage.innerText = 'Message';
     friendMessage.setAttribute('onclick', `openFriendDM('${friendData.username}');`);
     newFriend.appendChild(friendMessage);
     var friendProfile = document.createElement('button');
-    friendProfile.innerHTML = 'Profile';
+    friendProfile.innerText = 'Profile';
     friendProfile.setAttribute('onclick', `viewProfile('${friendData.username}');`);
     newFriend.appendChild(friendProfile);
     parentElement.appendChild(newFriend);
@@ -176,14 +176,14 @@ function addNewIncomingFriend(parentElement, friendData) {
     friendImage.setAttribute('src', friendData.imageURL);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
-    friendName.innerHTML = friendData.displayname;
+    friendName.innerText = friendData.displayname;
     newFriend.appendChild(friendName);
     var friendDeny = document.createElement('button');
-    friendDeny.innerHTML = 'Deny';
+    friendDeny.innerText = 'Deny';
     friendDeny.setAttribute('onclick', `denyFriendRequest('${friendData.username}');`);
     newFriend.appendChild(friendDeny);
     var friendAccept = document.createElement('button');
-    friendAccept.innerHTML = 'Accept';
+    friendAccept.innerText = 'Accept';
     friendAccept.setAttribute('onclick', `acceptFriendRequest('${friendData.username}');`);
     newFriend.appendChild(friendAccept);
     parentElement.appendChild(newFriend);
@@ -195,10 +195,10 @@ function addNewOutgoingFriend(parentElement, friendData) {
     friendImage.setAttribute('src', friendData.imageURL);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
-    friendName.innerHTML = friendData.displayname;
+    friendName.innerText = friendData.displayname;
     newFriend.appendChild(friendName);
     var friendCancel = document.createElement('button');
-    friendCancel.innerHTML = 'Cancel';
+    friendCancel.innerText = 'Cancel';
     friendCancel.setAttribute('onclick', `cancelFriendRequest('${friendData.username}');`);
     newFriend.appendChild(friendCancel);
     parentElement.appendChild(newFriend);
@@ -210,10 +210,10 @@ function addNewBlockedUser(parentElement, userData) {
     blockedUserImage.setAttribute('src', userData.imageURL);
     newBlockedUser.appendChild(blockedUserImage);
     var blockedUserName = document.createElement('span');
-    blockedUserName.innerHTML = userData.displayname;
+    blockedUserName.innerText = userData.displayname;
     newBlockedUser.appendChild(blockedUserName);
     var blockedUserUnblock = document.createElement('button');
-    blockedUserUnblock.innerHTML = 'Unblock';
+    blockedUserUnblock.innerText = 'Unblock';
     blockedUserUnblock.setAttribute('onclick', `unblockUser('${userData.username}');`);
     newBlockedUser.appendChild(blockedUserUnblock);
     parentElement.appendChild(newBlockedUser);
@@ -230,9 +230,9 @@ function populateFriends() {
                 friends = data;
                 var friendsList = document.getElementById('friends-list');
                 if (data.length === 0)
-                    friendsList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                    friendsList.getElementsByClassName('loading')[0].innerText = 'Nothing here';
                 else
-                    friendsList.innerHTML = '';
+                    friendsList.innerText = '';
                 for (var friend of data) {
                     addNewFriend(friendsList, friend);
                 }
@@ -241,9 +241,9 @@ function populateFriends() {
                 socket.on('returnIncomingFriendRequests', (data) => {
                     var friendsIncoming = document.getElementById('friends-incoming');
                     if (data.length === 0)
-                        friendsIncoming.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                        friendsIncoming.getElementsByClassName('loading')[0].innerText = 'Nothing here';
                     else
-                        friendsIncoming.innerHTML = '';
+                        friendsIncoming.innerText = '';
                     for (var friend of data) {
                         addNewIncomingFriend(friendsIncoming, friend);
                     }
@@ -252,9 +252,9 @@ function populateFriends() {
                     socket.on('returnOutgoingFriendRequests', (data) => {
                         var friendsOutgoing = document.getElementById('friends-outgoing');
                         if (data.length === 0)
-                            friendsOutgoing.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                            friendsOutgoing.getElementsByClassName('loading')[0].innerText = 'Nothing here';
                         else
-                            friendsOutgoing.innerHTML = '';
+                            friendsOutgoing.innerText = '';
                         for (var friend of data) {
                             addNewOutgoingFriend(friendsOutgoing, friend);
                         }
@@ -263,9 +263,9 @@ function populateFriends() {
                         socket.on('returnBlockedUsers', (data) => {
                             var blockedUsers = document.getElementById('blocked-users');
                             if (data.length === 0)
-                                blockedUsers.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                                blockedUsers.getElementsByClassName('loading')[0].innerText = 'Nothing here';
                             else
-                                blockedUsers.getElementsByClassName('loading')[0].innerHTML = '';
+                                blockedUsers.getElementsByClassName('loading')[0].innerText = '';
                             for (var user of data) {
                                 addNewBlockedUser(blockedUsers, user);
                             }

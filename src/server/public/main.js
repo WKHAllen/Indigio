@@ -65,7 +65,7 @@ function buildRoom(roomData) {
     newRoom.appendChild(roomImage);
     // Name
     var roomName = document.createElement('span');
-    roomName.innerHTML = roomData.name;
+    roomName.innerText = roomData.name;
     newRoom.appendChild(roomName);
     if (roomData.roomType === dmRoomType) {
         newRoom.addEventListener('contextmenu', (e) => {
@@ -106,17 +106,17 @@ function buildMessage(messageData) {
     // Displayname
     messageDisplayname = document.createElement('span');
     messageDisplayname.classList.add('displayname');
-    messageDisplayname.innerHTML = messageData.displayname;
+    messageDisplayname.innerText = messageData.displayname;
     newMessage.appendChild(messageDisplayname);
     // Timestamp
     messageTimestamp = document.createElement('span');
     messageTimestamp.classList.add('timestamp');
-    messageTimestamp.innerHTML = new Date(messageData.timestamp * 1000).toLocaleString();
+    messageTimestamp.innerText = new Date(messageData.timestamp * 1000).toLocaleString();
     newMessage.appendChild(messageTimestamp);
     // Content
     messageContent = document.createElement('span');
     messageContent.classList.add('message-content');
-    messageContent.innerHTML = messageData.text;
+    messageContent.innerText = messageData.text;
     newMessage.appendChild(messageContent);
     if (messageData.username === username) {
         newMessage.addEventListener('contextmenu', (e) => {
@@ -248,7 +248,7 @@ function main() {
         });
         socket.on('editedMessage', (data) => {
             if (data.roomid === roomID) {
-                document.getElementById(`message-${data.messageid}`).getElementsByClassName('message-content')[0].innerHTML = data.messageContent;
+                document.getElementById(`message-${data.messageid}`).getElementsByClassName('message-content')[0].innerText = data.messageContent;
             }
         });
         socket.on('deletedMessage', (data) => {

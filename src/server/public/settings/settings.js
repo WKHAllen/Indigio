@@ -21,7 +21,7 @@ function updateImageSize() {
 
 function updateLightTheme() {
     window.open('https://kotaku.com/nobody-understands-the-people-who-use-discords-light-th-1825305763', '_blank');
-    document.getElementById('light-theme-option').innerHTML = 'No';
+    document.getElementById('light-theme-option').innerText = 'No';
 }
 
 function reset() {

@@ -2,7 +2,7 @@ var passwordResetID = new URLSearchParams(window.location.search).get('resetID')
 
 function showError(msg) {
     var errorText = document.getElementById('error-text');
-    errorText.innerHTML = msg;
+    errorText.innerText = msg;
     errorText.classList.remove('invisible');
 }
 

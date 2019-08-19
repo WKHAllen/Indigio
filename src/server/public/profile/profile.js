@@ -60,15 +60,15 @@ function unblockUser() {
 }
 
 function main() {
-    document.getElementById('title-username').innerHTML = `${profileUsername}'s `;
+    document.getElementById('title-username').innerText = `${profileUsername}'s `;
     var socket = io.connect(url, { secure: true });
     socket.emit('getUserInfo', { 'username': profileUsername });
     socket.on('returnUserInfo', (data) => {
         if (data !== null) {
-            document.getElementById('username-label').innerHTML = data.username;
-            document.getElementById('displayname-label').innerHTML = data.displayname;
+            document.getElementById('username-label').innerText = data.username;
+            document.getElementById('displayname-label').innerText = data.displayname;
             document.getElementById('image-label').innerHTML = `<img src="${data.imageURL}" width="32" height="32">`;
-            document.getElementById('image-url-label').innerHTML = data.imageURL;
+            document.getElementById('image-url-label').innerText = data.imageURL;
             if (profileUsername !== username) {
                 socket.emit('login', { 'username': username, 'password': password });
                 socket.on('validLogin', (data) => {
@@ -77,7 +77,7 @@ function main() {
                         socket.on('isFriend', (data) => {
                             if (data.res) {
                                 var addFriendButton = document.getElementById('add-friend-button');
-                                addFriendButton.innerHTML = 'Remove friend';
+                                addFriendButton.innerText = 'Remove friend';
                                 addFriendButton.setAttribute('onclick', 'removeFriend();');
                             }
                             document.getElementById('add-friend').classList.remove('invisible');
@@ -85,7 +85,7 @@ function main() {
                             socket.on('isBlocked', (data) => {
                                 if (data.res) {
                                     var blockUserButton = document.getElementById('block-user-button');
-                                    blockUserButton.innerHTML = 'Unblock';
+                                    blockUserButton.innerText = 'Unblock';
                                     blockUserButton.setAttribute('onclick', 'unblockUser();');
                                 }
                                 document.getElementById('block-user').classList.remove('invisible');
@@ -98,7 +98,7 @@ function main() {
                 });
             }
         } else {
-            document.getElementsByClassName('middle-content')[0].innerHTML = 'This user does not exist.';
+            document.getElementsByClassName('middle-content')[0].innerText = 'This user does not exist.';
             socket.disconnect();
         }
     });

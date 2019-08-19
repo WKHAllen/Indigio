@@ -5,18 +5,18 @@ function setRoomName() {
     var roomName = stripWhitespace(document.getElementById('room-name').value);
     var status = document.getElementById('room-name-status');
     status.style.color = 'var(--primary-text-color)';
-    status.innerHTML = 'Changing room name...';
+    status.innerText = 'Changing room name...';
     var socket = io.connect(url, { secure: true });
     socket.emit('login', { 'username': username, 'password': password });
     socket.on('validLogin', (data) => {
         if (data.res) {
             socket.emit('setRoomName', { 'roomid': roomID, 'roomName': roomName });
             status.style.color = 'var(--success-text-color)';
-            status.innerHTML = 'Room name change successful';
-            document.getElementById('room-name-label').innerHTML = roomName;
+            status.innerText = 'Room name change successful';
+            document.getElementById('room-name-label').innerText = roomName;
         } else {
             status.style.color = 'var(--error-text-color)';
-            status.innerHTML = 'Failed to change room name';
+            status.innerText = 'Failed to change room name';
         }
         document.getElementById('room-name-button').disabled = false;
         socket.disconnect();
@@ -28,7 +28,7 @@ function setRoomImage() {
     var roomImage = stripWhitespace(document.getElementById('room-image').value);
     var status = document.getElementById('room-image-status');
     status.style.color = 'var(--primary-text-color)';
-    status.innerHTML = 'Changing room image URL...';
+    status.innerText = 'Changing room image URL...';
     validImageURL(roomImage, (res) => {
         if (res) {
             var socket = io.connect(url, { secure: true });
@@ -37,18 +37,18 @@ function setRoomImage() {
                 if (data.res) {
                     socket.emit('setRoomImage', { 'roomid': roomID, 'roomImage': roomImage });
                     status.style.color = 'var(--success-text-color)';
-                    status.innerHTML = 'Room image URL change successful';
+                    status.innerText = 'Room image URL change successful';
                     document.getElementById('room-image-label').innerHTML = `<img src="${roomImage}" width="32" height="32">`;
                 } else {
                     status.style.color = 'var(--error-text-color)';
-                    status.innerHTML = 'Failed to change room image URL';
+                    status.innerText = 'Failed to change room image URL';
                 }
                 document.getElementById('room-image-button').disabled = false;
                 socket.disconnect();
             });
         } else {
             status.style.color = 'var(--error-text-color)';
-            status.innerHTML = 'Invalid URL';
+            status.innerText = 'Invalid URL';
             document.getElementById('room-image-button').disabled = false;
         }
     });
@@ -121,15 +121,15 @@ function addNewMember(parentElement, memberData, creator) {
     var memberName = document.createElement('span');
     if (creator)
         memberName.classList.add('creator');
-    memberName.innerHTML = memberData.displayname;
+    memberName.innerText = memberData.displayname;
     newMember.appendChild(memberName);
     var memberProfile = document.createElement('button');
-    memberProfile.innerHTML = 'Profile';
+    memberProfile.innerText = 'Profile';
     memberProfile.setAttribute('onclick', `viewProfile('${memberData.username}');`);
     newMember.appendChild(memberProfile);
     if (creator) {
         var memberRemove = document.createElement('button');
-        memberRemove.innerHTML = 'Remove';
+        memberRemove.innerText = 'Remove';
         memberRemove.setAttribute('onclick', `removeMember('${memberData.username}');`);
         newMember.appendChild(memberRemove);
     }
@@ -151,7 +151,7 @@ function populateOptions() {
                     // get room name
                     socket.emit('getRoomName', { 'roomid': roomID });
                     socket.on('returnRoomName', (data) => {
-                        document.getElementById('room-name-label').innerHTML = data.roomName;
+                        document.getElementById('room-name-label').innerText = data.roomName;
                         document.getElementById('room-name').value = data.roomName;
                         // get image URL
                         socket.emit('getRoomImage', { 'roomid': roomID });
@@ -163,9 +163,9 @@ function populateOptions() {
                             socket.on('returnRoomMembers', (data) => {
                                 var memberList = document.getElementById('room-members-list');
                                 if (data.length === 0)
-                                    memberList.getElementsByClassName('loading')[0].innerHTML = 'Nothing here';
+                                    memberList.getElementsByClassName('loading')[0].innerText = 'Nothing here';
                                 else
-                                    memberList.innerHTML = '';
+                                    memberList.innerText = '';
                                 for (var member of data) {
                                     addNewMember(memberList, member, creator);
                                 }

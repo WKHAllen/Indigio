@@ -5,17 +5,17 @@ function editMessage() {
     var messageContent = stripWhitespace(document.getElementById('edit-message').value);
     var status = document.getElementById('edit-message-status');
     status.style.color = 'var(--primary-text-color)';
-    status.innerHTML = 'Editing message...';
+    status.innerText = 'Editing message...';
     var socket = io.connect(url, { secure: true });
     socket.emit('login', { 'username': username, 'password': password });
     socket.on('validLogin', (data) => {
         if (data.res) {
             socket.emit('editMessage', { 'messageid': messageID, 'messageContent': messageContent });
             status.style.color = 'var(--success-text-color)';
-            status.innerHTML = 'Message content changed successfully';
+            status.innerText = 'Message content changed successfully';
         } else {
             status.style.color = 'var(--error-text-color)';
-            status.innerHTML = 'Failed to edit message';
+            status.innerText = 'Failed to edit message';
         }
         document.getElementById('edit-message-button').disabled = false;
         socket.disconnect();
@@ -49,7 +49,7 @@ function populateOptions() {
                         var fromLabel = document.getElementById('message-from-label')
                         fromLabel.style.lineHeight = '32px';
                         fromLabel.innerHTML = `<img src="${data.imageURL}" width="32" height="32" style="float: left;"><span style="padding-left: var(--std-padding);">${data.displayname}</span>`;
-                        document.getElementById('message-at-label').innerHTML = new Date(data.createTimestamp * 1000).toLocaleString();
+                        document.getElementById('message-at-label').innerText = new Date(data.createTimestamp * 1000).toLocaleString();
                         document.getElementById('edit-message').value = data.text;
                     });
                 } else {
