@@ -46,6 +46,12 @@ function openRoom(roomid) {
     window.location.replace(newURL.href);
 }
 
+function viewProfileByUsername(profileUsername) {
+    var newURL = new URL(window.location.origin + '/profile');
+    newURL.searchParams.set('username', profileUsername);
+    window.location.replace(newURL.href);
+}
+
 function viewProfileByRoomID(roomid) {
     socket.emit('getOtherDMMemberUsername', { 'roomid': roomid });
     socket.on('returnOtherDMMemberUsername', (data) => {
@@ -102,16 +108,20 @@ function buildMessage(messageData) {
     // Image
     messageImg = document.createElement('img');
     messageImg.setAttribute('src', messageData.imageURL);
+    messageImg.setAttribute('onclick', `viewProfileByUsername('${messageData.username}');`);
+    messageImg.style.cursor = 'pointer';
     newMessage.appendChild(messageImg);
     // Displayname
     messageDisplayname = document.createElement('span');
     messageDisplayname.classList.add('displayname');
-    messageDisplayname.innerText = messageData.displayname;
+    messageDisplayname.innerText = messageData.displayname + ' ';
+    messageDisplayname.setAttribute('onclick', `viewProfileByUsername('${messageData.username}');`);
+    messageDisplayname.style.cursor = 'pointer';
     newMessage.appendChild(messageDisplayname);
     // Timestamp
     messageTimestamp = document.createElement('span');
     messageTimestamp.classList.add('timestamp');
-    messageTimestamp.innerText = new Date(messageData.timestamp * 1000).toLocaleString();
+    messageTimestamp.innerText = new Date(messageData.timestamp * 1000).toLocaleString() + ' ';
     newMessage.appendChild(messageTimestamp);
     // Content
     messageContent = document.createElement('span');
