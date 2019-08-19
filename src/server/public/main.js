@@ -98,6 +98,7 @@ function addNewRoomAbove(parentElement, roomData) {
 function buildMessage(messageData) {
     var newMessage = document.createElement('div');
     newMessage.classList.add('message');
+    newMessage.setAttribute('id', `message-${messageData.id}`);
     // Image
     messageImg = document.createElement('img');
     messageImg.setAttribute('src', messageData.imageURL);
@@ -117,6 +118,14 @@ function buildMessage(messageData) {
     messageContent.classList.add('message-content');
     messageContent.innerHTML = messageData.text;
     newMessage.appendChild(messageContent);
+    if (messageData.username === username) {
+        newMessage.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            var newURL = new URL(window.location.origin + '/manage-message');
+            newURL.searchParams.set('messageid', messageData.id);
+            window.location.replace(newURL.href);
+        });
+    }
     return newMessage;
 }
 
@@ -235,6 +244,17 @@ function main() {
             if (data.roomid === roomID) {
                 mainInput.removeAttribute('disabled');
                 mainInput.removeAttribute('placeholder');
+            }
+        });
+        socket.on('editedMessage', (data) => {
+            if (data.roomid === roomID) {
+                document.getElementById(`message-${data.messageid}`).getElementsByClassName('message-content')[0].innerHTML = data.messageContent;
+            }
+        });
+        socket.on('deletedMessage', (data) => {
+            if (data.roomid === roomID) {
+                var deletedMessage = document.getElementById(`message-${data.messageid}`);
+                deletedMessage.parentNode.removeChild(deletedMessage);
             }
         });
     });

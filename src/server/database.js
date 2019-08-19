@@ -729,8 +729,8 @@ function getDMImage(username, roomID, callback) {
 
 function getMessages(roomID, size, callback) {
     var sql = `
-        SELECT text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
-            SELECT text, userid, roomid, createTimestamp FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
+        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+            SELECT id, text, userid, roomid, createTimestamp FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp ASC;`;
     var params = [roomID, size];
     mainDB.execute(sql, params, (err, rows) => {
@@ -741,8 +741,8 @@ function getMessages(roomID, size, callback) {
 
 function getMoreMessages(roomID, size, loadedMessages, callback) {
     var sql = `
-        SELECT text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
-            SELECT text, userid, roomid, createTimestamp FROM messages WHERE id NOT IN (
+        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+            SELECT id, text, userid, roomid, createTimestamp FROM messages WHERE id NOT IN (
                 SELECT id FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
             ) AND roomid = ? LIMIT ?
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp DESC;`;
@@ -775,6 +775,57 @@ function createMessage(text, username, roomID, callback) {
     params = [getTime(), roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
+    });
+}
+
+function canManageMessage(username, messageID, callback) {
+    var sql = `
+        SELECT id FROM messages WHERE userid = (
+            SELECT id FROM users WHERE username = ?
+        ) AND id = ?;`;
+    var params = [username, messageID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length === 1);
+    });
+}
+
+function getMessageInfo(messageID, callback) {
+    var sql = `
+        SELECT text, createTimestamp, username, displayname, imageURL FROM (
+            SELECT text, userid, createTimestamp FROM messages WHERE id = ?
+        ) messages1 JOIN users ON messages1.userid = users.id;`;
+    var params = [messageID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0]);
+    });
+}
+
+function editMessage(messageID, messageContent, callback) {
+    var sql = `UPDATE messages SET text = ? WHERE id = ?;`;
+    var params = [messageContent, messageID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback();
+    });
+}
+
+function deleteMessage(messageID, callback) {
+    var sql = `DELETE FROM messages WHERE id = ?;`;
+    var params = [messageID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback();
+    });
+}
+
+function roomOfMessage(messageID, callback) {
+    var sql = `SELECT roomid FROM messages WHERE id = ?;`;
+    var params = [messageID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows[0].roomid);
     });
 }
 
@@ -910,6 +961,11 @@ module.exports = {
     'getMessages': getMessages,
     'getMoreMessages': getMoreMessages,
     'createMessage': createMessage,
+    'canManageMessage': canManageMessage,
+    'getMessageInfo': getMessageInfo,
+    'editMessage': editMessage,
+    'deleteMessage': deleteMessage,
+    'roomOfMessage': roomOfMessage,
     'emailExists': emailExists,
     'newPasswordResetID': newPasswordResetID,
     'checkPasswordResetID': checkPasswordResetID,

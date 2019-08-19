@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Indigio - Manage Message</title>
+        <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/main.css">
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/utils.js"></script>
+        <script type="text/javascript" src="manageMessage.js"></script>
+    </head>
+    <body class="main">
+        <div id="menu-bar">
+            <div class="main-title">
+                <h3 class="title">Indigio</h3>
+            </div>
+            <img src="/favicon.ico">
+            <ul id="menu-list">
+                <li><a href="/"><button>Home</button></a></li><!--
+             --><li><a href="/about/"><button>About</button></a></li><!--
+             --><li><a href="/settings/"><button>Settings</button></a></li><!--
+             --><li><a href="/account/"><button>Account</button></a></li><!--
+             --><li><a href="/friends/"><button>Friends</button></a></li><!--
+             --><li><a href="/logout/"><button>Logout</button></a></li>
+            </ul>
+            <ul id="window-menu" class="invisible">
+                <li><button onclick="windowMinimize();"><img src="/assets/minimize.ico"></button></li><!--
+             --><li><button onclick="windowMaximize();"><img src="/assets/maximize.ico"></button></li><!--
+             --><li><button onclick="windowClose();"><img src="/assets/close.ico"></button></li>
+            </ul>
+        </div>
+        <div class="main-div">
+            <h1 class="centered-text">Manage Message</h1>
+            <div class="middle-content">
+                <table class="account-info">
+                    <tr>
+                        <td>From: </td>
+                        <td id="message-from-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                    <tr>
+                        <td>At: </td>
+                        <td id="message-at-label"><span class="loading">Loading...</span></td>
+                    </tr>
+                </table>
+                <div class="settings-option">
+                    <label for="edit-message">Edit message</label>
+                    <input type="text" id="edit-message" maxlength="2000" onkeydown="onEnterClick('edit-message-button');">
+                    <button type="button" id="edit-message-button" class="space-above" onclick="editMessage();">Save message</button>
+                    <span id="edit-message-status"></span>
+                </div>
+                <div>
+                    <button type="button" class="space-above" id="delete-message-button" onclick="deleteMessage();">Delete message</button>
+                </div>
+                <div>
+                    <button type="button" class="space-above" onclick="goHome();">Home</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

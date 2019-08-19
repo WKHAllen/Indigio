@@ -179,11 +179,12 @@ function newMessage(username, data) {
         if (res) {
             database.getRoomType(data.roomid, (roomType) => {
                 if (roomType === database.normalRoomType) {
-                    database.createMessage(data.text, username, data.roomid);
-                    var now = getTime();
-                    database.getUserDisplayname(username, (displayname) => {
-                        database.getUserImage(username, (image) => {
-                            io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                    database.createMessage(data.text, username, data.roomid, (messageID) => {
+                        var now = getTime();
+                        database.getUserDisplayname(username, (displayname) => {
+                            database.getUserImage(username, (image) => {
+                                io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                            });
                         });
                     });
                 } else if (roomType === database.dmRoomType) {
@@ -192,11 +193,12 @@ function newMessage(username, data) {
                             if (!res) {
                                 database.isBlocked(otherUsername, username, (res) => {
                                     if (!res) {
-                                        database.createMessage(data.text, username, data.roomid);
-                                        var now = getTime();
-                                        database.getUserDisplayname(username, (displayname) => {
-                                            database.getUserImage(username, (image) => {
-                                                io.to(data.roomid.toString()).emit('incomingMessage', { 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                                        database.createMessage(data.text, username, data.roomid, (messageID) => {
+                                            var now = getTime();
+                                            database.getUserDisplayname(username, (displayname) => {
+                                                database.getUserImage(username, (image) => {
+                                                    io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                                                });
                                             });
                                         });
                                     }
@@ -273,8 +275,8 @@ function checkValidRoom(socket, username, data) {
 }
 
 function deleteRoom(username, data) {
-    database.userInRoom(username, data.roomid, (res) => {
-        if (res) {
+    database.isRoomCreator(username, data.roomid, (isCreator) => {
+        if (isCreator) {
             database.getRoomType(data.roomid, (roomType) => {
                 if (roomType !== null && roomType !== database.dmRoomType) {
                     database.deleteRoom(data.roomid);
@@ -417,6 +419,46 @@ function getBlockedUsers(socket, username) {
     });
 }
 
+function checkValidMessage(socket, username, data) {
+    database.canManageMessage(username, data.messageid, (res) => {
+        socket.emit('validMessage', { 'res': res });
+    });
+}
+
+function getMessageInfo(socket, username, data) {
+    database.canManageMessage(username, data.messageid, (res) => {
+        if (res) {
+            database.getMessageInfo(data.messageid, (data) => {
+                socket.emit('returnMessageInfo', data);
+            });
+        }
+    });
+}
+
+function editMessage(username, data) {
+    database.canManageMessage(username, data.messageid, (res) => {
+        if (res) {
+            database.roomOfMessage(data.messageid, (roomID) => {
+                database.editMessage(data.messageid, data.messageContent, () => {
+                    io.to(roomID.toString()).emit('editedMessage', { 'roomid': roomID, 'messageid': data.messageid, 'messageContent': data.messageContent });
+                });
+            });
+        }
+    });
+}
+
+function deleteMessage(username, data) {
+    database.canManageMessage(username, data.messageid, (res) => {
+        if (res) {
+            database.roomOfMessage(data.messageid, (roomID) => {
+                database.deleteMessage(data.messageid, () => {
+                    io.to(roomID.toString()).emit('deletedMessage', { 'roomid': roomID, 'messageid': data.messageid });
+                });
+            });
+        }
+    });
+}
+
 function main(socket, username) {
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
@@ -455,6 +497,10 @@ function main(socket, username) {
     socket.on('blockUser', (data) => { blockUser(username, data); });
     socket.on('unblockUser', (data) => { unblockUser(username, data); });
     socket.on('getBlockedUsers', () => { getBlockedUsers(socket, username); });
+    socket.on('checkValidMessage', (data) => { checkValidMessage(socket, username, data); });
+    socket.on('getMessageInfo', (data) => { getMessageInfo(socket, username, data); });
+    socket.on('editMessage', (data) => { editMessage(username, data); });
+    socket.on('deleteMessage', (data) => { deleteMessage(username, data); });
 }
 
 function register(socket, data) {
