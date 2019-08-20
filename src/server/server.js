@@ -207,41 +207,43 @@ function getMoreMessages(socket, username, data) {
 
 function newMessage(username, data) {
     if ('roomid' in data && 'text' in data) {
-        database.userInRoom(username, data.roomid, (res) => {
-            if (res) {
-                database.getRoomType(data.roomid, (roomType) => {
-                    if (roomType === database.normalRoomType) {
-                        database.createMessage(data.text, username, data.roomid, (messageID) => {
-                            var now = getTime();
-                            database.getUserDisplayname(username, (displayname) => {
-                                database.getUserImage(username, (image) => {
-                                    io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+        if (typeof data.text === 'string' && data.text.length <= 1000) {
+            database.userInRoom(username, data.roomid, (res) => {
+                if (res) {
+                    database.getRoomType(data.roomid, (roomType) => {
+                        if (roomType === database.normalRoomType) {
+                            database.createMessage(data.text, username, data.roomid, (messageID) => {
+                                var now = getTime();
+                                database.getUserDisplayname(username, (displayname) => {
+                                    database.getUserImage(username, (image) => {
+                                        io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                                    });
                                 });
                             });
-                        });
-                    } else if (roomType === database.dmRoomType) {
-                        database.getOtherDMMemberUsername(data.roomid, username, (otherUsername) => {
-                            database.isBlocked(username, otherUsername, (res) => {
-                                if (!res) {
-                                    database.isBlocked(otherUsername, username, (res) => {
-                                        if (!res) {
-                                            database.createMessage(data.text, username, data.roomid, (messageID) => {
-                                                var now = getTime();
-                                                database.getUserDisplayname(username, (displayname) => {
-                                                    database.getUserImage(username, (image) => {
-                                                        io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                        } else if (roomType === database.dmRoomType) {
+                            database.getOtherDMMemberUsername(data.roomid, username, (otherUsername) => {
+                                database.isBlocked(username, otherUsername, (res) => {
+                                    if (!res) {
+                                        database.isBlocked(otherUsername, username, (res) => {
+                                            if (!res) {
+                                                database.createMessage(data.text, username, data.roomid, (messageID) => {
+                                                    var now = getTime();
+                                                    database.getUserDisplayname(username, (displayname) => {
+                                                        database.getUserImage(username, (image) => {
+                                                            io.to(data.roomid.toString()).emit('incomingMessage', { 'id': messageID, 'text': data.text, 'username': username, 'displayname': displayname, 'imageURL': image, 'roomid': data.roomid, 'timestamp': now });
+                                                        });
                                                     });
                                                 });
-                                            });
-                                        }
-                                    });
-                                }
+                                            }
+                                        });
+                                    }
+                                });
                             });
-                        });
-                    }
-                });
-            }
-        });
+                        }
+                    });
+                }
+            });
+        }
     }
 }
 
@@ -594,9 +596,27 @@ function main(socket, username) {
 
 function register(socket, data) {
     if ('username' in data && 'displayname' in data && 'email' in data && 'password' in data) {
-        database.createUser(data.username, data.displayname, data.email, data.password, (res) => {
-            socket.emit('validRegistration', { 'res': res });
-        });
+        if (typeof data.username === 'string' && 2 <= data.username.length && data.username.length <= 32) {
+            if (typeof data.displayname === 'string' && 2 <= data.displayname.length && data.displayname.length <= 32) {
+                if (typeof data.email === 'string' && data.email.length <= 32 && data.email.match(/^([A-Za-z0-9.]+)@([a-z0-9]+)\.([a-z]+)$/g) !== null) {
+                    if (typeof data.password === 'string' && 8 <= data.password.length && data.password.length <= 32) {
+                        database.createUser(data.username, data.displayname, data.email, data.password, (res) => {
+                            socket.emit('validRegistration', { 'res': res });
+                        });
+                    } else {
+                        socket.emit('validRegistration', { 'res': false, 'error': 'password must be between 8 and 64 characters' });
+                    }
+                } else {
+                    socket.emit('validRegistration', { 'res': false, 'error': 'email must be less than 32 characters, and must be in the proper format' });
+                }
+            } else {
+                socket.emit('validRegistration', { 'res': false, 'error': 'displayname must be between 2 and 32 characters' });
+            }
+        } else {
+            socket.emit('validRegistration', { 'res': false, 'error': 'username must be between 2 and 32 characters' });
+        }
+    } else {
+        socket.emit('validRegistration', { 'res': false, 'error': 'username, displayname, email, password expected' });
     }
 }
 
@@ -611,6 +631,8 @@ function login(socket, data) {
                 main(socket, data.username);
             }
         });
+    } else {
+        socket.emit('validLogin', { 'res': false, 'error': 'username, password expected' });
     }
 }
 
@@ -622,6 +644,8 @@ function resetPassword(socket, data) {
                 passwordReset.passwordReset(data.email, address);
             }
         });
+    } else {
+        socket.emit('validPasswordReset', { 'res': false, 'error': 'email expected' });
     }
 }
 
@@ -635,6 +659,8 @@ function checkPasswordResetID(socket, data) {
                 });
             }
         });
+    } else {
+        socket.emit('validPasswordResetID', { 'res': false, 'error': 'passwordResetID, newPassword expected' });
     }
 }
 

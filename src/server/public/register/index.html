@@ -32,9 +32,9 @@
             <h1 class="centered-text">Register Account</h1>
             <div class="middle-content">
                 <label class="form-label" for="username">Username <span class="smaller-text">(unchangeable)</span></label>
-                <input class="form-input" type="text" id="username" maxlength="32" onkeydown="onEnter();">
+                <input class="form-input" type="text" id="username" minlength="2" maxlength="32" onkeydown="onEnter();">
                 <label class="form-label" for="displayname">Display name <span class="smaller-text">(changeable)</span></label>
-                <input class="form-input" type="text" id="displayname" maxlength="32" onkeydown="onEnter();">
+                <input class="form-input" type="text" id="displayname" minlength="2" maxlength="32" onkeydown="onEnter();">
                 <label class="form-label" for="email">Email address <span class="smaller-text">(unchangeable and kept private)</span></label>
                 <input class="form-input" type="email" id="email" maxlength="32" onkeydown="onEnter();">
                 <label class="form-label" for="password">Password <span class="smaller-text">(changeable)</span></label>
