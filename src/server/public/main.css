@@ -29,6 +29,12 @@
     --menu-dark-color: #2f0f8f;
     --menu-dark-hover: #3f1faf;
     --menu-dark-active: #4f2fcf;
+    --menu-selected: #0f3faf;
+    --menu-selected-hover: #1f4fbf;
+    --menu-selected-active: #2f5fcf;
+    --menu-unread: #4f1faf;
+    --menu-unread-hover: #5f2fbf;
+    --menu-unread-active: #6f3fcf;
     --input-color: #1f2fbf;
     --message-user-color: #00afff;
     --message-timestamp-color: #9f9fcf;
@@ -394,6 +400,30 @@ a:focus {
 
 #room-list li:active {
     background-color: var(--menu-dark-active);
+}
+
+#room-list li.selected-room {
+    background-color: var(--menu-selected);
+}
+
+#room-list li.selected-room:hover {
+    background-color: var(--menu-selected-hover);
+}
+
+#room-list li.selected-room:active {
+    background-color: var(--menu-selected-active);
+}
+
+#room-list li.unread-room {
+    background-color: var(--menu-unread);
+}
+
+#room-list li.unread-room:hover {
+    background-color: var(--menu-unread-hover);
+}
+
+#room-list li.unread-room:active {
+    background-color: var(--menu-unread-active);
 }
 
 #room-list button {

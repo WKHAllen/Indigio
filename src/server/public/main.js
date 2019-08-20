@@ -61,10 +61,18 @@ function viewProfileByRoomID(roomid) {
     });
 }
 
+function markUnread(roomid) {
+    document.getElementById(`room-${roomid}`).classList.add('unread-room');
+}
+
 function buildRoom(roomData) {
     var newRoom = document.createElement('li');
     newRoom.setAttribute('onclick', `openRoom(${roomData.id});`);
     newRoom.setAttribute('id', `room-${roomData.id}`);
+    if (roomData.id === roomID)
+        newRoom.classList.add('selected-room');
+    else if (roomData.lastRead < roomData.updateTimestamp)
+        newRoom.classList.add('unread-room');
     // Image
     var roomImage = document.createElement('img');
     roomImage.setAttribute('src', roomData.imageURL);
@@ -192,6 +200,7 @@ function main() {
             }
             if (validRoom(data)) {
                 localStorage.setItem(localOpenRoom, roomID);
+                socket.emit('readMessage', { 'roomid': roomID });
             } else {
                 localStorage.removeItem(localOpenRoom);
                 window.location.replace('/');
@@ -222,12 +231,15 @@ function main() {
         });
         socket.on('incomingMessage', (data) => {
             if (data.roomid === roomID) {
+                socket.emit('readMessage', { 'roomid': data.roomid });
                 if (username === data.username || messagesDiv.scrollTop >= messagesDiv.scrollHeight - messagesDiv.clientHeight) {
                     addNewMessage(messagesDiv, data);
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } else {
                     addNewMessage(messagesDiv, data);
                 }
+            } else {
+                markUnread(data.roomid);
             }
             if (roomList.children.length > 1) {
                 var room = document.getElementById(`room-${data.roomid}`);

@@ -46,7 +46,8 @@ function init() {
         CREATE TABLE IF NOT EXISTS roomUsers (
             roomid INT NOT NULL,
             userid INT NOT NULL,
-            joinTimestamp INT NOT NULL
+            joinTimestamp INT NOT NULL,
+            lastRead INT
         );
     `;
     var messagesTable = `
@@ -337,7 +338,7 @@ function getIncomingFriendRequests(username, callback) {
 
 function acceptIncomingFriendRequest(username1, username2) {
     removeIncomingFriendRequest(username1, username2);
-    removeIncomingFriendRequest(username2, username1); // just in case
+    removeIncomingFriendRequest(username2, username1);
     addFriend(username1, username2);
 }
 
@@ -594,18 +595,18 @@ function getRoomInfo(roomID, callback) {
 function getRooms(username, callback) {
     var sql = `
         SELECT * FROM (
-            SELECT rooms1.id, roomType, updateTimestamp, name, imageURL FROM (
+            SELECT rooms1.id, roomType, updateTimestamp, name, imageURL, lastRead FROM (
                 SELECT id, roomType, updateTimestamp, name, imageURL FROM rooms WHERE roomType != ?
             ) rooms1 JOIN (
-                SELECT roomid FROM roomUsers WHERE userid = (
+                SELECT roomid, lastRead FROM roomUsers WHERE userid = (
                     SELECT id FROM users WHERE username = ?
                 )
             ) roomUsers1 ON rooms1.id = roomUsers1.roomid
             UNION
-            SELECT rooms2.id, roomType, updateTimestamp, name, imageURL FROM (
+            SELECT rooms2.id, roomType, updateTimestamp, name, imageURL, lastRead FROM (
                 SELECT id, roomType, updateTimestamp FROM rooms WHERE roomType = ?
             ) rooms2 JOIN (
-                SELECT roomid, userid FROM roomUsers WHERE userid = (
+                SELECT roomid, userid, lastRead FROM roomUsers WHERE userid = (
                     SELECT id FROM users WHERE username = ?
                 )
             ) roomUsers2 ON rooms2.id = roomUsers2.roomid JOIN (
@@ -829,6 +830,17 @@ function roomOfMessage(messageID, callback) {
     });
 }
 
+function readMessage(username, roomID) {
+    var sql = `
+        UPDATE roomUsers SET lastRead = ? WHERE userid = (
+            SELECT id FROM users WHERE username = ?
+        ) AND roomid = ?;`;
+    var params = [getTime(), username, roomID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+    });
+}
+
 function emailExists(email, callback) {
     var sql = `SELECT email FROM users WHERE email = ?`;
     var params = [email];
@@ -966,6 +978,7 @@ module.exports = {
     'editMessage': editMessage,
     'deleteMessage': deleteMessage,
     'roomOfMessage': roomOfMessage,
+    'readMessage': readMessage,
     'emailExists': emailExists,
     'newPasswordResetID': newPasswordResetID,
     'checkPasswordResetID': checkPasswordResetID,

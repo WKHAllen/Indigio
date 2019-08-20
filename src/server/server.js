@@ -459,6 +459,10 @@ function deleteMessage(username, data) {
     });
 }
 
+function readMessage(username, data) {
+    database.readMessage(username, data.roomid);
+}
+
 function main(socket, username) {
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
@@ -501,6 +505,7 @@ function main(socket, username) {
     socket.on('getMessageInfo', (data) => { getMessageInfo(socket, username, data); });
     socket.on('editMessage', (data) => { editMessage(username, data); });
     socket.on('deleteMessage', (data) => { deleteMessage(username, data); });
+    socket.on('readMessage', (data) => { readMessage(username, data); });
 }
 
 function register(socket, data) {
