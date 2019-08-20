@@ -36,4 +36,4 @@ def index():
                 conn.close()
                 return render_template("index.html", status="Command executed successfully", command=stmt)
         except Exception as e:
-            return render_template("index.html", status=e.args[0])
+            return render_template("index.html", status=e.args[0], command=stmt)
