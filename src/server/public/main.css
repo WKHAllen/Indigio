@@ -21,6 +21,7 @@
     --tertiary-text-color: #7f9fff;
     --tertiary-text-hover: #5f7fef;
     --tertiary-text-active: #3f5fdf;
+    --selection-color: #004fcf;
     --error-text-color: #cf0000;
     --success-text-color: #00af3f;
     --menu-color: #0f0faf;
@@ -63,8 +64,12 @@
     background-color: var(--tertiary-text-active);
 }
 
+::-moz-selection {
+    background-color: var(--selection-color);
+}
+  
 ::selection {
-    background-color: var(--secondary-active);
+    background-color: var(--selection-color);
 }
 
 * {
