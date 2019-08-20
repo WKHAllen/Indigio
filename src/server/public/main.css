@@ -259,6 +259,10 @@ a:focus {
     height: 100%;
 }
 
+#menu-list li a:focus {
+    box-shadow: none;
+}
+
 #menu-list li a button {
     color: var(--secondary-color);
     background-color: var(--menu-color);

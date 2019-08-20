@@ -249,9 +249,11 @@ function main() {
         });
         socket.on('newRoom', (roomData) => {
             addNewRoomAbove(roomList, roomData);
+            markUnread(roomData.id);
         });
         socket.on('roomJoin', (roomData) => {
             addNewRoomAbove(roomList, roomData);
+            markUnread(roomData.id);
         });
         socket.on('roomKick', (roomData) => {
             removeRoom(roomData.roomid);
