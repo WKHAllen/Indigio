@@ -19,6 +19,7 @@ if (localStorage.getItem(localSettings) === null)
 
 var isElectron = (window && window.process && window.process.type) !== undefined;
 if (isElectron) {
+    const open = require('open');
     const remote = require('electron').remote;
     var remoteWindow = remote.getCurrentWindow();
     window.addEventListener('load', () => {
@@ -43,6 +44,16 @@ if (isElectron) {
 
     function windowClose() {
         remoteWindow.close();
+    }
+
+    function electronifyLink(element) {
+        var href = element.href;
+        element.onclick = async function() {
+            await open(href);
+        }
+        element.removeAttribute('href');
+        element.removeAttribute('target');
+        element.style.cursor = 'pointer';
     }
 }
 

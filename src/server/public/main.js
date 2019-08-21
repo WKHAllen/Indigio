@@ -109,6 +109,52 @@ function addNewRoomAbove(parentElement, roomData) {
     parentElement.insertBefore(newRoom, parentElement.children[1]);
 }
 
+function linkify(messageContentElement, messageText) {
+    var remainingMessage = messageText;
+    var textElement, linkElement;
+    do {
+        var match = remainingMessage.match(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/);
+        if (match !== null) {
+            if (match.index === 0) {
+                // link
+                linkElement = document.createElement('a');
+                linkElement.href = match[0];
+                linkElement.target = '_blank';
+                if (isElectron) {
+                    electronifyLink(linkElement);
+                }
+                linkElement.innerText = match[0];
+                messageContentElement.appendChild(linkElement);
+                remainingMessage = remainingMessage.slice(match[0].length);
+            } else {
+                // text
+                textElement = document.createElement('span');
+                textElement.innerText = remainingMessage.slice(0, match.index);
+                messageContentElement.appendChild(textElement);
+                remainingMessage = remainingMessage.slice(match.index);
+                // link
+                linkElement = document.createElement('a');
+                linkElement.href = match[0];
+                linkElement.target = '_blank';
+                if (isElectron) {
+                    electronifyLink(linkElement);
+                }
+                linkElement.innerText = match[0];
+                messageContentElement.appendChild(linkElement);
+                remainingMessage = remainingMessage.slice(match[0].length);
+            }
+        } else {
+            if (remainingMessage.length > 0) {
+                // text
+                textElement = document.createElement('span');
+                textElement.innerText = remainingMessage;
+                messageContentElement.appendChild(textElement);
+                remainingMessage = '';
+            }
+        }
+    } while (remainingMessage.length > 0);
+}
+
 function buildMessage(messageData) {
     var newMessage = document.createElement('div');
     newMessage.classList.add('message');
@@ -134,7 +180,7 @@ function buildMessage(messageData) {
     // Content
     messageContent = document.createElement('span');
     messageContent.classList.add('message-content');
-    messageContent.innerText = messageData.text;
+    linkify(messageContent, messageData.text);
     newMessage.appendChild(messageContent);
     if (messageData.username === username) {
         newMessage.addEventListener('contextmenu', (e) => {
@@ -272,7 +318,9 @@ function main() {
         });
         socket.on('editedMessage', (data) => {
             if (data.roomid === roomID) {
-                document.getElementById(`message-${data.messageid}`).getElementsByClassName('message-content')[0].innerText = data.messageContent;
+                var messageContent = document.getElementById(`message-${data.messageid}`).getElementsByClassName('message-content')[0];
+                messageContent.innerText = '';
+                linkify(messageContent, data.messageContent);
             }
         });
         socket.on('deletedMessage', (data) => {
