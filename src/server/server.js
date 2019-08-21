@@ -2,8 +2,8 @@ const express = require('express');
 const http = require('http');
 const sio = require('socket.io');
 const path = require('path');
-const database = require('./database.js');
-const passwordReset = require('./passwordReset.js');
+const database = require('./database');
+const passwordReset = require('./passwordReset');
 
 var app = express();
 const publicDir = 'public';

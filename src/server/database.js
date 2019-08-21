@@ -1,7 +1,7 @@
 const path = require('path');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const db = require('./db.js');
+const db = require('./db');
 
 const dbFile = path.join(__dirname, 'db', 'main.db');
 const saltRounds = 12;

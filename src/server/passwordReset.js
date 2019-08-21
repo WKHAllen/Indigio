@@ -1,7 +1,14 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
-const database = require('./database.js');
-const loginInfo = require('./loginInfo.js');
+const database = require('./database');
+try {
+    const loginInfo = require('./loginInfo');
+    var indigioEmail = loginInfo.email;
+    var indigioPassword = loginInfo.password;
+} catch (err) {
+    var indigioEmail = process.env.EMAIL_ADDRESS;
+    var indigioPassword = process.env.EMAIL_PASSWORD;
+}
 
 const emailBodyFile = 'passwordReset.html';
 
@@ -11,8 +18,8 @@ function sendEmail(email, resetURL) {
         var transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             auth: {
-                user: loginInfo.email,
-                pass: loginInfo.password
+                user: indigioEmail,
+                pass: indigioPassword
             }
         });
         var mailOptions = {
