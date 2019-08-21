@@ -1,0 +1,24 @@
+{
+  "name": "indigio",
+  "version": "0.1.0",
+  "description": "Indigio is a chatting app available on the web and as a desktop application",
+  "main": "server.js",
+  "scripts": {
+    "start": "cd src/server && npm start",
+    "postinstall": "cd src/server && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "10.16.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WKHAllen/Indigio.git"
+  },
+  "author": "Will Allen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WKHAllen/Indigio/issues"
+  },
+  "homepage": "https://github.com/WKHAllen/Indigio#readme"
+}
