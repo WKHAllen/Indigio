@@ -4,7 +4,7 @@ Indigio is an open source chatting app, and it's available on the web and as a d
 
 ## Deployment
 
-Indigio will eventually be deployed on [Heroku](https://www.heroku.com/). As of now, there are no stable releases, so the app has not been deployed.
+Indigio is currently deployed on Heroku [here](https://indigio.herokuapp.com/). Several problems still exist, so it may take a bit of time before Heroku is able to fully deploy it.
 
 ## Browser Compatibility
 
