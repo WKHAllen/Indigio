@@ -1,5 +1,6 @@
 node_modules
 __pycache__
+.vscode
 todo.txt
 src/server/db/main.db
 src/server/db/main.db-journal
