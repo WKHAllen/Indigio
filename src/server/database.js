@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const db = require('./db');
 
-const dbFile = path.join(__dirname, 'db', 'main.db');
+const dbFile = path.resolve(__dirname, 'db', 'main.db');
 const saltRounds = 12;
 const dmRoomType = 0;
 const normalRoomType = 1;

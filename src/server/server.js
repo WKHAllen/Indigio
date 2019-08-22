@@ -7,7 +7,7 @@ const passwordReset = require('./passwordReset');
 
 var app = express();
 const publicDir = 'public';
-const errorDir = path.join(__dirname, publicDir, 'errors');
+const errorDir = path.resolve(__dirname, publicDir, 'errors');
 var server = http.Server(app);
 var io = sio(server);
 var host = process.env.HOST || 'localhost';
@@ -24,14 +24,14 @@ var userSockets = new Map();
 var userSocketsReversed = new Map();
 var userRooms = new Map();
 
-app.use(express.static(path.join(__dirname, publicDir)));
+app.use(express.static(path.resolve(__dirname, publicDir)));
 
 app.use(function(req, res, next) {
-    return res.status(404).sendFile(path.join(__dirname, errorDir, '404.html'));
+    return res.status(404).sendFile(path.resolve(__dirname, errorDir, '404.html'));
 });
 
 app.use(function(err, req, res, next) {
-    return res.status(500).send(path.join(__dirname, errorDir, '500.html'));
+    return res.status(500).send(path.resolve(__dirname, errorDir, '500.html'));
 });
 
 function getTime() {
