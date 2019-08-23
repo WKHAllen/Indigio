@@ -20,6 +20,7 @@ class DB {
                 release();
                 console.log(stmt);
                 console.log(res);
+                if (err) throw err;
                 if (callback) callback(err, res.rows);
             });
         });
