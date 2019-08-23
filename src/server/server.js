@@ -246,9 +246,7 @@ function newMessage(username, data) {
 
 function createRoom(socket, username) {
     database.createRoom(username, database.normalRoomType, database.defaultRoomName, (roomid) => {
-        console.log('Created room', roomid);
         database.addToRoom(roomid, username, () => {
-            console.log('Added', username, 'to room', roomid);
             var now = getTime();
             socket.emit('newRoom', { 'id': roomid, 'roomtype': database.normalRoomType, 'updatetimestamp': now, 'name': database.defaultRoomName, 'imageurl': database.defaultRoomImageURL });
             socket.join(roomid.toString());
@@ -624,7 +622,6 @@ function login(socket, data) {
         database.verifyLogin(data.username, data.password, (res, username) => {
             socket.emit('validLogin', { 'res': res, 'username': username });
             if (res) {
-                console.log('USER SUCCESSFULLY LOGGED IN');
                 userSockets.set(data.username, socket);
                 userSocketsReversed.set(socket, data.username);
                 main(socket, data.username);
@@ -676,7 +673,6 @@ function getUserInfo(socket, data) {
 function start() {
     io.on('connection', (socket) => {
         var date = (new Date()).toString();
-        console.log(`[${date}] user joined`);
         socket.on('register', (data) => { register(socket, data); });
         socket.on('login', (data) => { login(socket, data); });
         socket.on('passwordReset', (data) => { resetPassword(socket, data); });
@@ -684,7 +680,6 @@ function start() {
         socket.on('getUserInfo', (data) => { getUserInfo(socket, data); });
         socket.on('disconnect', () => {
             date = (new Date()).toString();
-            console.log(`[${date}] user left`);
             userSockets.delete(userSocketsReversed.get(socket));
             userSocketsReversed.delete(socket);
         });

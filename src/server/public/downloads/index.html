@@ -33,8 +33,11 @@
                 <div id="no-downloads" class="invisible">
                     <p>Looks like you already have the app! No need to download anything.</p>
                 </div>
-                <div id="downloads">
-                    <p>Download links will appear here once release versions have been created. If you'd like to speed up the development process, feel free to contribute by visiting the <a href="https://github.com/WKHAllen/Indigio" target="_blank">Indigio repository</a>.</p>
+                <div>
+                    <button id="download-button" onclick="document.getElementById('downloads').classList.remove('invisible');">Download</button>
+                </div>
+                <div id="downloads" class="invisible">
+                    Downloads will appear here in the near future. In the mean time, please use the app in your browser.
                 </div>
                 <button class="space-above" onclick="goBack();">Return</button>
             </div>
