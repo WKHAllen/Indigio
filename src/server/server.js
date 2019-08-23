@@ -71,13 +71,13 @@ function setPassword(username, data) {
 
 function getFriends(socket, username) {
     database.getFriends(username, (data) => {
-        socket.emit('returnFriends', data);
+        socket.emit('returnFriends', { 'id': data.id, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
     });
 }
 
 function getIncomingFriendRequests(socket, username) {
     database.getIncomingFriendRequests(username, (data) => {
-        socket.emit('returnIncomingFriendRequests', data);
+        socket.emit('returnIncomingFriendRequests', { 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
     });
 }
 
@@ -93,7 +93,7 @@ function removeIncomingFriendRequest(username, data) {
 
 function getOutgoingFriendRequests(socket, username) {
     database.getOutgoingFriendRequests(username, (data) => {
-        socket.emit('returnOutgoingFriendRequests', data);
+        socket.emit('returnOutgoingFriendRequests', { 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
     });
 }
 
@@ -137,7 +137,7 @@ function removeFriend(username, data) {
 
 function getRooms(socket, username) {
     database.getRooms(username, (data) => {
-        socket.emit('returnRooms', data);
+        socket.emit('returnRooms', { 'id': data.id, 'roomType': data.roomtype, 'updateTimestamp': data.updatetimestamp, 'name': data.name, 'imageURL': data.imageurl, 'lastRead': data.lastread });
         for (var room of data) {
             socket.join(room.id.toString());
             if (!userRooms.has(room.id))
@@ -150,7 +150,7 @@ function getRooms(socket, username) {
 function getDMImage(socket, username, data) {
     if ('roomid' in data) {
         database.getDMImage(username, data.roomid, (data) => {
-            socket.emit('returnDMImage', data);
+            socket.emit('returnDMImage', { 'imageURL': data.imageurl });
         });
     } else {
         socket.emit('returnDMImage', { 'error': 'roomid expected' });
@@ -164,7 +164,7 @@ function getMessages(socket, username, data) {
                 database.getRoomType(data.roomid, (roomType) => {
                     if (roomType === database.normalRoomType) {
                         database.getMessages(data.roomid, data.size, (data) => {
-                            socket.emit('returnMessages', { 'messages': data, 'blocked': false });
+                            socket.emit('returnMessages', { 'messages': { 'id': data.id, 'text': data.text, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl, 'roomid': data.roomid, 'timestamp': data.timestamp }, 'blocked': false });
                         });
                     } else if (roomType === database.dmRoomType) {
                         database.getOtherDMMemberUsername(data.roomid, username, (otherUsername) => {
@@ -172,9 +172,9 @@ function getMessages(socket, username, data) {
                                 database.isBlocked(otherUsername, username, (blocked2) => {
                                     database.getMessages(data.roomid, data.size, (data) => {
                                         if (blocked1 || blocked2)
-                                            socket.emit('returnMessages', { 'messages': data, 'blocked': true });
+                                            socket.emit('returnMessages', { 'messages': { 'id': data.id, 'text': data.text, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl, 'roomid': data.roomid, 'timestamp': data.timestamp }, 'blocked': true });
                                         else
-                                            socket.emit('returnMessages', { 'messages': data, 'blocked': false });
+                                            socket.emit('returnMessages', { 'messages': { 'id': data.id, 'text': data.text, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl, 'roomid': data.roomid, 'timestamp': data.timestamp }, 'blocked': false });
                                     });
                                 });
                             });
@@ -193,7 +193,7 @@ function getMoreMessages(socket, username, data) {
         database.userInRoom(username, data.roomid, (res) => {
             if (res) {
                 database.getMoreMessages(data.roomid, data.size, data.loadedMessages, (data) => {
-                    socket.emit('returnMoreMessages', data);
+                    socket.emit('returnMoreMessages', { 'id': data.id, 'text': data.text, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl, 'roomid': data.roomid, 'timestamp': data.timestamp });
                 });
             }
         });
@@ -394,7 +394,7 @@ function getRoomMembers(socket, username, data) {
         database.userInRoom(username, data.roomid, (res) => {
             if (res) {
                 database.getUsersInRoom(data.roomid, (data) => {
-                    socket.emit('returnRoomMembers', data);
+                    socket.emit('returnRoomMembers', { 'id': data.id, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
                 });
             }
         });
@@ -485,7 +485,7 @@ function unblockUser(username, data) {
 
 function getBlockedUsers(socket, username) {
     database.getBlockedUsers(username, (data) => {
-        socket.emit('returnBlockedUsers', data);
+        socket.emit('returnBlockedUsers', { 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
     });
 }
 
@@ -504,7 +504,7 @@ function getMessageInfo(socket, username, data) {
         database.canManageMessage(username, data.messageid, (res) => {
             if (res) {
                 database.getMessageInfo(data.messageid, (data) => {
-                    socket.emit('returnMessageInfo', data);
+                    socket.emit('returnMessageInfo', { 'text': data.text, 'createTimestamp': data.createtimestamp, 'username': data.username, 'displayname': data.displayname, 'imageURL': data.imageurl });
                 });
             }
         });
