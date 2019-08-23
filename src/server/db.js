@@ -1,3 +1,67 @@
+const { Pool } = require('pg');
+
+class DB {
+    constructor(dbURL) {
+        this.pool = new Pool({
+            connectionString: dbURL,
+            // ssl: true,
+            max: 1
+        });
+    }
+
+    execute(stmt, params, callback) {
+        var paramCount = 0;
+        while (stmt.includes('?')) {
+            stmt = stmt.replace('?', `$${++paramCount}`);
+        }
+        this.pool.connect((err, client, release) => {
+            if (err) throw err;
+            client.query(stmt, params, (err, res) => {
+                release();
+                if (callback) callback(err, res.rows);
+            });
+        });
+    }
+
+    executeAfter(stmt, params, callback, afterStmt, afterParams, afterCallback) {
+        var paramCount = 0;
+        while (stmt.includes('?')) {
+            stmt = stmt.replace('?', `$${++paramCount}`);
+        }
+        paramCount = 0;
+        while (afterStmt.includes('?')) {
+            afterStmt = afterStmt.replace('?', `$${++paramCount}`);
+        }
+        this.pool.connect((err, client, release) => {
+            if (err) throw err;
+            client.query(stmt, params, (err, res) => {
+                if (callback) callback(err, res.rows);
+            });
+            client.query(afterStmt, afterParams, (err, res) => {
+                release();
+                if (callback) callback(err, res.rows);
+            });
+        });
+    }
+
+    executeMany(stmts, callback) {
+        this.pool.connect((err, client, release) => {
+            if (err) throw err;
+            for (let stmt of stmts) {
+                client.query(stmt, (err, res) => {
+                    if (callback) callback(err, res.rows);
+                });
+            }
+            release();
+        });
+    }
+}
+
+module.exports = {
+    'DB': DB
+}
+
+/*
 const sqlite3 = require('sqlite3').verbose();
 
 const busyTimeout = 1000;
@@ -68,3 +132,4 @@ class DB {
 module.exports = {
     'DB': DB
 }
+*/

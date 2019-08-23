@@ -1,9 +1,10 @@
-const path = require('path');
+// const path = require('path');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const db = require('./db');
 
-const dbFile = path.resolve(__dirname, 'db', 'main.db');
+// const dbFile = path.join(__dirname, 'db', 'main.db');
+const dbURL = process.env.DATABASE_URL;
 const saltRounds = 12;
 const dmRoomType = 0;
 const normalRoomType = 1;
@@ -12,7 +13,7 @@ const defaultUserImageURL = '/assets/userDefault.ico';
 const defaultRoomImageURL = '/assets/roomDefault.ico';
 const hexLength = 64;
 
-var mainDB = new db.DB(dbFile);
+var mainDB = new db.DB(dbURL);
 
 function getTime() {
     return Math.floor(new Date().getTime() / 1000);
