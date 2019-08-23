@@ -611,7 +611,7 @@ function getRooms(username, callback) {
                     SELECT id FROM users WHERE username = ?
                 )
             ) roomUsers2 ON rooms2.id = roomUsers2.roomid JOIN (
-                SELECT displayname name, imageURL, roomid FROM (
+                SELECT displayname AS name, imageURL, roomid FROM (
                     SELECT * FROM users WHERE username != ?
                 ) users1 JOIN roomUsers ON users1.id = userid
             ) users2 ON users2.roomid = rooms2.id
@@ -731,7 +731,7 @@ function getDMImage(username, roomID, callback) {
 
 function getMessages(roomID, size, callback) {
     var sql = `
-        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp AS timestamp FROM users JOIN (
             SELECT id, text, userid, roomid, createTimestamp FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createTimestamp ASC;`;
     var params = [roomID, size];
@@ -743,7 +743,7 @@ function getMessages(roomID, size, callback) {
 
 function getMoreMessages(roomID, size, loadedMessages, callback) {
     var sql = `
-        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp timestamp FROM users JOIN (
+        SELECT roomMessages.id, text, username, displayname, imageURL, roomid, createTimestamp AS timestamp FROM users JOIN (
             SELECT id, text, userid, roomid, createTimestamp FROM messages WHERE id NOT IN (
                 SELECT id FROM messages WHERE roomid = ? ORDER BY createTimestamp DESC LIMIT ?
             ) AND roomid = ? LIMIT ?
