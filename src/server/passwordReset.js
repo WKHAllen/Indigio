@@ -23,7 +23,7 @@ function sendEmail(email, resetURL) {
             }
         });
         var mailOptions = {
-            from: loginInfo.email,
+            from: indigioEmail,
             to: email,
             subject: 'Indigio Password Reset',
             html: data.replace('{}', resetURL),
