@@ -1,13 +1,16 @@
 const express = require('express');
+const enforce = require('express-sslify');
 const http = require('http');
 const sio = require('socket.io');
 const path = require('path');
 const database = require('./database');
 const passwordReset = require('./passwordReset');
 
-var app = express();
 const publicDir = 'public';
 const errorDir = path.join(__dirname, publicDir, 'errors');
+
+var app = express();
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 var server = http.Server(app);
 var io = sio(server);
 var port = process.env.PORT || 3000;
@@ -15,7 +18,7 @@ server.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 
-var address = 'https://indigio.herokuapp.com';
+var address = 'https://www.indigio.co';
 
 var userSockets = new Map();
 var userSocketsReversed = new Map();
