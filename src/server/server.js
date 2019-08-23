@@ -137,6 +137,7 @@ function removeFriend(username, data) {
 
 function getRooms(socket, username) {
     database.getRooms(username, (data) => {
+        console.log(data);
         socket.emit('returnRooms', { 'id': data.id, 'roomType': data.roomtype, 'updateTimestamp': data.updatetimestamp, 'name': data.name, 'imageURL': data.imageurl, 'lastRead': data.lastread });
         for (var room of data) {
             socket.join(room.id.toString());
