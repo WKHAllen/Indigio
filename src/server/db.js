@@ -18,6 +18,8 @@ class DB {
             if (err) throw err;
             client.query(stmt, params, (err, res) => {
                 release();
+                console.log(stmt);
+                console.log(res);
                 if (callback) callback(err, res.rows);
             });
         });
