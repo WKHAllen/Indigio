@@ -116,7 +116,7 @@ function removeMember(memberUsername) {
 function addNewMember(parentElement, memberData, creator) {
     var newMember = document.createElement('li');
     var memberImage = document.createElement('img');
-    memberImage.setAttribute('src', memberData.imageURL);
+    memberImage.setAttribute('src', memberData.imageurl);
     newMember.appendChild(memberImage);
     var memberName = document.createElement('span');
     if (creator)

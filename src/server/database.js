@@ -723,7 +723,7 @@ function getDMImage(username, roomID, callback) {
     var params = [username, roomID];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
-        if (callback && rows.length === 1) callback(rows[0]);
+        if (callback && rows.length === 1) callback(rows[0].imageurl);
     });
 }
 

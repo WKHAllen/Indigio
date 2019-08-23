@@ -67,8 +67,8 @@ function main() {
         if (data !== null) {
             document.getElementById('username-label').innerText = data.username;
             document.getElementById('displayname-label').innerText = data.displayname;
-            document.getElementById('image-label').innerHTML = `<img src="${data.imageURL}" width="32" height="32">`;
-            document.getElementById('image-url-label').innerText = data.imageURL;
+            document.getElementById('image-label').innerHTML = `<img src="${data.imageurl}" width="32" height="32">`;
+            document.getElementById('image-url-label').innerText = data.imageurl;
             if (profileUsername !== username) {
                 socket.emit('login', { 'username': username, 'password': password });
                 socket.on('validLogin', (data) => {

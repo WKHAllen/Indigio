@@ -131,7 +131,7 @@ function unblockUser(blockedUsername) {
 function addNewSearchResult(parentElement, friendData) {
     var newFriend = document.createElement('li');
     var friendImage = document.createElement('img');
-    friendImage.setAttribute('src', friendData.imageURL);
+    friendImage.setAttribute('src', friendData.imageurl);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
     friendName.innerText = friendData.displayname;
@@ -150,7 +150,7 @@ function addNewSearchResult(parentElement, friendData) {
 function addNewFriend(parentElement, friendData) {
     var newFriend = document.createElement('li');
     var friendImage = document.createElement('img');
-    friendImage.setAttribute('src', friendData.imageURL);
+    friendImage.setAttribute('src', friendData.imageurl);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
     friendName.innerText = friendData.displayname;
@@ -173,7 +173,7 @@ function addNewFriend(parentElement, friendData) {
 function addNewIncomingFriend(parentElement, friendData) {
     var newFriend = document.createElement('li');
     var friendImage = document.createElement('img');
-    friendImage.setAttribute('src', friendData.imageURL);
+    friendImage.setAttribute('src', friendData.imageurl);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
     friendName.innerText = friendData.displayname;
@@ -192,7 +192,7 @@ function addNewIncomingFriend(parentElement, friendData) {
 function addNewOutgoingFriend(parentElement, friendData) {
     var newFriend = document.createElement('li');
     var friendImage = document.createElement('img');
-    friendImage.setAttribute('src', friendData.imageURL);
+    friendImage.setAttribute('src', friendData.imageurl);
     newFriend.appendChild(friendImage);
     var friendName = document.createElement('span');
     friendName.innerText = friendData.displayname;
@@ -207,7 +207,7 @@ function addNewOutgoingFriend(parentElement, friendData) {
 function addNewBlockedUser(parentElement, userData) {
     var newBlockedUser = document.createElement('li');
     var blockedUserImage = document.createElement('img');
-    blockedUserImage.setAttribute('src', userData.imageURL);
+    blockedUserImage.setAttribute('src', userData.imageurl);
     newBlockedUser.appendChild(blockedUserImage);
     var blockedUserName = document.createElement('span');
     blockedUserName.innerText = userData.displayname;

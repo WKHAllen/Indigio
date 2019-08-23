@@ -48,8 +48,8 @@ function populateOptions() {
                     socket.on('returnMessageInfo', (data) => {
                         var fromLabel = document.getElementById('message-from-label')
                         fromLabel.style.lineHeight = '32px';
-                        fromLabel.innerHTML = `<img src="${data.imageURL}" width="32" height="32" style="float: left;"><span style="padding-left: var(--std-padding);">${data.displayname}</span>`;
-                        document.getElementById('message-at-label').innerText = new Date(data.createTimestamp * 1000).toLocaleString();
+                        fromLabel.innerHTML = `<img src="${data.imageurl}" width="32" height="32" style="float: left;"><span style="padding-left: var(--std-padding);">${data.displayname}</span>`;
+                        document.getElementById('message-at-label').innerText = new Date(data.createtimestamp * 1000).toLocaleString();
                         document.getElementById('edit-message').value = data.text;
                     });
                 } else {

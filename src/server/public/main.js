@@ -71,11 +71,11 @@ function buildRoom(roomData) {
     newRoom.setAttribute('id', `room-${roomData.id}`);
     if (roomData.id === roomID)
         newRoom.classList.add('selected-room');
-    else if (roomData.lastRead < roomData.updateTimestamp)
+    else if (roomData.lastread < roomData.updatetimestamp)
         newRoom.classList.add('unread-room');
     // Image
     var roomImage = document.createElement('img');
-    roomImage.setAttribute('src', roomData.imageURL);
+    roomImage.setAttribute('src', roomData.imageurl);
     newRoom.appendChild(roomImage);
     // Name
     var roomName = document.createElement('span');
@@ -161,7 +161,7 @@ function buildMessage(messageData) {
     newMessage.setAttribute('id', `message-${messageData.id}`);
     // Image
     messageImg = document.createElement('img');
-    messageImg.setAttribute('src', messageData.imageURL);
+    messageImg.setAttribute('src', messageData.imageurl);
     messageImg.setAttribute('onclick', `viewProfileByUsername('${messageData.username}');`);
     messageImg.style.cursor = 'pointer';
     newMessage.appendChild(messageImg);
