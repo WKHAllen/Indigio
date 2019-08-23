@@ -7,31 +7,28 @@ const passwordReset = require('./passwordReset');
 
 var app = express();
 const publicDir = 'public';
-const errorDir = path.resolve(__dirname, publicDir, 'errors');
+const errorDir = path.join(__dirname, publicDir, 'errors');
 var server = http.Server(app);
 var io = sio(server);
-var host = process.env.HOST || 'localhost';
 var port = process.env.PORT || 3000;
-server.listen(port, host, () => {
-    console.log(`Server running on ${host}:${port}`);
+server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
 
-var address;
-if (port !== 80) address = 'http://' + host + ':' + port;
-else address = 'http://' + host;
+var address = 'https://indigio.herokuapp.com';
 
 var userSockets = new Map();
 var userSocketsReversed = new Map();
 var userRooms = new Map();
 
-app.use(express.static(path.resolve(__dirname, publicDir)));
+app.use(express.static(path.join(__dirname, publicDir)));
 
 app.use(function(req, res, next) {
-    return res.status(404).sendFile(path.resolve(__dirname, errorDir, '404.html'));
+    return res.status(404).sendFile(path.join(__dirname, errorDir, '404.html'));
 });
 
 app.use(function(err, req, res, next) {
-    return res.status(500).send(path.resolve(__dirname, errorDir, '500.html'));
+    return res.status(500).send(path.join(__dirname, errorDir, '500.html'));
 });
 
 function getTime() {
