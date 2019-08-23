@@ -615,7 +615,7 @@ function getRooms(username, callback) {
                     SELECT * FROM users WHERE username != ?
                 ) users1 JOIN roomUsers ON users1.id = userid
             ) users2 ON users2.roomid = rooms2.id
-        ) ORDER BY updateTimestamp DESC;`;
+        ) subq ORDER BY updateTimestamp DESC;`;
     var params = [dmRoomType, username, dmRoomType, username, username];
     mainDB.execute(sql, params, (err, rows) => {
         if (err) throw err;
