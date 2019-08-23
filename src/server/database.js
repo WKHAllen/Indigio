@@ -22,7 +22,7 @@ function getTime() {
 function init() {
     var usersTable = `
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             username TEXT NOT NULL,
             displayname TEXT NOT NULL,
             email TEXT NOT NULL,
@@ -34,7 +34,7 @@ function init() {
     `;
     var roomsTable = `
         CREATE TABLE IF NOT EXISTS rooms (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             creatorid INTEGER NULL,
             roomType INT NOT NULL,
             name TEXT,
@@ -53,7 +53,7 @@ function init() {
     `;
     var messagesTable = `
         CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             text TEXT NOT NULL,
             userid INT NOT NULL,
             roomid INT NOT NULL,
@@ -76,7 +76,7 @@ function init() {
     `;
     var passwordResetTable = `
         CREATE TABLE IF NOT EXISTS passwordReset (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             email TEXT NOT NULL,
             resetid TEXT NOT NULL,
             createTimestamp INT NOT NULL
