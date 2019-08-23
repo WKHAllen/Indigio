@@ -1,10 +1,20 @@
 const { Pool } = require('pg');
 
+function logError(stmt, res, err) {
+    console.log('\n\n######### ERROR #########\n\n');
+    console.log('\nStatement:');
+    console.log(stmt);
+    console.log('\nResponse: ');
+    console.log(res);
+    console.log('\nError:');
+    throw err;
+}
+
 class DB {
     constructor(dbURL) {
         this.pool = new Pool({
             connectionString: dbURL,
-            // ssl: true,
+            ssl: true,
             max: 1
         });
     }
@@ -18,15 +28,7 @@ class DB {
             if (err) throw err;
             client.query(stmt, params, (err, res) => {
                 release();
-                if (err) {
-                    console.log('\n\n######### ERROR #########\n\n');
-                    console.log('\nStatement:');
-                    console.log(stmt);
-                    console.log('\nResponse: ');
-                    console.log(res);
-                    console.log('\nError:');
-                    throw err;
-                }
+                if (err) logError(stmt, res, err);
                 if (callback) callback(err, res.rows);
             });
         });
@@ -44,11 +46,13 @@ class DB {
         this.pool.connect((err, client, release) => {
             if (err) throw err;
             client.query(stmt, params, (err, res) => {
+                if (err) logError(stmt, res, err);
                 if (callback) callback(err, res.rows);
-            });
-            client.query(afterStmt, afterParams, (err, res) => {
-                release();
-                if (callback) callback(err, res.rows);
+                client.query(afterStmt, afterParams, (err, res) => {
+                    release();
+                    if (err) logError(stmt, res, err);
+                    if (afterCallback) afterCallback(err, res.rows);
+                });
             });
         });
     }
@@ -58,6 +62,10 @@ class DB {
             if (err) throw err;
             for (let stmt of stmts) {
                 client.query(stmt, (err, res) => {
+                    if (err) {
+                        release();
+                        logError(stmt, res, err);
+                    }
                     if (callback) callback(err, res.rows);
                 });
             }

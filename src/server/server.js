@@ -246,7 +246,9 @@ function newMessage(username, data) {
 
 function createRoom(socket, username) {
     database.createRoom(username, database.normalRoomType, database.defaultRoomName, (roomid) => {
+        console.log('Created room', roomid);
         database.addToRoom(roomid, username, () => {
+            console.log('Added', username, 'to room', roomid);
             var now = getTime();
             socket.emit('newRoom', { 'id': roomid, 'roomtype': database.normalRoomType, 'updatetimestamp': now, 'name': database.defaultRoomName, 'imageurl': database.defaultRoomImageURL });
             socket.join(roomid.toString());

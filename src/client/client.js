@@ -25,7 +25,7 @@ function createWindow() {
         }
     });
     win.removeMenu();
-    win.loadURL('http://localhost:3000');
+    win.loadURL('https://indigio.herokuapp.com');
     win.on('closed', () => {
         win = null
     });
