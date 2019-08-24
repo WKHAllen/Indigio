@@ -81,7 +81,7 @@ function buildRoom(roomData) {
     var roomName = document.createElement('span');
     roomName.innerText = roomData.name;
     newRoom.appendChild(roomName);
-    if (roomData.roomType === dmRoomType) {
+    if (roomData.roomtype === dmRoomType) {
         newRoom.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             viewProfileByRoomID(roomData.id);
