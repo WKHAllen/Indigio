@@ -426,7 +426,7 @@ function removeOutgoingFriendRequest(username1, username2) {
 function getDMRoomID(username1, username2, callback) {
     var sql = `
         SELECT commonRooms.roomid FROM (
-            (
+            SELECT user1.roomid FROM (
                 SELECT roomid FROM roomUsers WHERE userid = (
                     SELECT id FROM users WHERE username = ?
                 )
