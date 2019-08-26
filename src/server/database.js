@@ -10,7 +10,7 @@ const defaultRoomName = 'New room';
 const defaultUserImageURL = '/assets/userDefault.ico';
 const defaultRoomImageURL = '/assets/roomDefault.ico';
 const hexLength = 64;
-const passwordResetTimeout = 60 * 1000;
+const passwordResetTimeout = 60 * 60 * 1000;
 
 var mainDB = new db.DB(dbURL);
 

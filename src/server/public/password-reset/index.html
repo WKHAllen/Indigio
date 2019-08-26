@@ -32,7 +32,8 @@
             <h1 class="centered-text">Password Reset</h1>
             <div class="middle-content">
                 <div class="space-below">
-                    <p>Enter your email below to reset your password. Once you do so, an email will be sent to you containing a link to reset your password. You will have <i>one hour</i> to reset your password before the link expires.</p>
+                    <p id="reset-info-1">Enter your email below to reset your password. Once you do so, an email will be sent to you containing a link to reset your password. You will have <i>one hour</i> to reset your password before the link expires. <i>DO NOT</i> send or show the link to anyone, or they will be able to reset your password.</p>
+                    <p id="reset-info-2" class="invisible">Enter a new password below. You will be able to change it again if you so desire. Once you have set your new password, the link in the email you received will expire.</p>
                 </div>
                 <label class="form-label" for="email" id="email-label">Email</label>
                 <input class="form-input" type="email" id="email" maxlength="32" onkeydown="onEnter();">

@@ -94,8 +94,10 @@ function main() {
         socket.emit('checkPasswordResetID', { 'passwordResetID': passwordResetID });
         socket.on('validPasswordResetID', (data) => {
             if (data.res) {
+                setInvisible('reset-info-1');
                 setInvisible('email-label');
                 setInvisible('email');
+                setVisible('reset-info-2');
                 setVisible('password-label');
                 setVisible('password');
                 setVisible('confirm-password-label');
