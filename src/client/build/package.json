@@ -1,0 +1,16 @@
+{
+  "name": "indigio-build",
+  "version": "0.1.0",
+  "description": "Packages the Indigio electron client",
+  "main": "build.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Will Allen",
+  "license": "MIT",
+  "devDependencies": {
+    "electron-packager": "^14.0.4",
+    "electron-winstaller": "^4.0.0"
+  }
+}

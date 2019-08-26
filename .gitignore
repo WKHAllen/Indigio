@@ -6,3 +6,5 @@ src/server/db/main.db
 src/server/db/main.db-journal
 src/server/manageDB/history.log
 src/server/loginInfo.js
+src/client/build/build
+src/client/build/dist

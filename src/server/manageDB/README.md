@@ -2,6 +2,8 @@
 
 This is a small Python script that exposes the database to developers. It is designed to make debugging and testing easier.
 
+This script is now obsolete, as the database has been moved to Heroku, and runs on PostgreSQL rather than SQLite.
+
 ## Usage
 
 To use it, simply run the following command:
