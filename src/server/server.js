@@ -646,12 +646,14 @@ function resetPassword(socket, data) {
 }
 
 function checkPasswordResetID(socket, data) {
-    if ('passwordResetID' in data && 'newPassword' in data) {
+    if ('passwordResetID' in data) {
         database.checkPasswordResetID(data.passwordResetID, (res) => {
             socket.emit('validPasswordResetID', { 'res': res });
             if (res) {
                 socket.on('resetPassword', (newData) => {
-                    database.resetPassword(data.passwordResetID, newData.newPassword);
+                    if ('newPassword' in newData) {
+                        database.resetPassword(data.passwordResetID, newData.newPassword);
+                    }
                 });
             }
         });
@@ -672,14 +674,12 @@ function getUserInfo(socket, data) {
 
 function start() {
     io.on('connection', (socket) => {
-        var date = (new Date()).toString();
         socket.on('register', (data) => { register(socket, data); });
         socket.on('login', (data) => { login(socket, data); });
         socket.on('passwordReset', (data) => { resetPassword(socket, data); });
         socket.on('checkPasswordResetID', (data) => { checkPasswordResetID(socket, data); });
         socket.on('getUserInfo', (data) => { getUserInfo(socket, data); });
         socket.on('disconnect', () => {
-            date = (new Date()).toString();
             userSockets.delete(userSocketsReversed.get(socket));
             userSocketsReversed.delete(socket);
         });

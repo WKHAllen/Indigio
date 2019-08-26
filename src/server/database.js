@@ -10,6 +10,7 @@ const defaultRoomName = 'New room';
 const defaultUserImageURL = '/assets/userDefault.ico';
 const defaultRoomImageURL = '/assets/roomDefault.ico';
 const hexLength = 64;
+const passwordResetTimeout = 60 * 1000;
 
 var mainDB = new db.DB(dbURL);
 
@@ -89,6 +90,15 @@ function init() {
     `;
     mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable, blockedUsersTable], (err, rows) => {
         if (err) throw err;
+    });
+    var sql = `SELECT resetid, createtimestamp FROM passwordReset;`;
+    mainDB.execute(sql, [], (err, rows) => {
+        if (err) throw err;
+        var timeRemaining;
+        for (var row of rows) {
+            timeRemaining = row.createtimestamp + Math.floor(passwordResetTimeout / 1000) - getTime();
+            setTimeout(deletePasswordResetID, timeRemaining * 1000, row.resetid);
+        }
     });
 }
 
@@ -867,6 +877,7 @@ function newPasswordResetID(email, callback) {
                     if (err) throw err;
                 }, sqlAfter, [], (err, rows) => {
                     if (err) throw err;
+                    setTimeout(deletePasswordResetID, passwordResetTimeout, rows[0].resetid);
                     if (callback) callback(rows[0].resetid);
                 });
             }
@@ -883,6 +894,15 @@ function checkPasswordResetID(passwordResetID, callback) {
     });
 }
 
+function deletePasswordResetID(passwordResetID, callback) {
+    var sql = `DELETE FROM passwordReset WHERE resetid = ?;`;
+    var params = [passwordResetID];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback();
+    });
+}
+
 function resetPassword(passwordResetID, newPassword) {
     var sql = `
         SELECT username FROM users JOIN (
@@ -893,10 +913,7 @@ function resetPassword(passwordResetID, newPassword) {
         if (err) throw err;
         if (rows.length === 1) {
             setUserPassword(rows[0].username, newPassword);
-            sql = `DELETE FROM passwordReset WHERE resetid = ?;`;
-            mainDB.execute(sql, params, (err, rows) => {
-                if (err) throw err;
-            });
+            deletePasswordResetID(passwordResetID);
         }
     });
 }
@@ -981,6 +998,7 @@ module.exports = {
     'emailExists': emailExists,
     'newPasswordResetID': newPasswordResetID,
     'checkPasswordResetID': checkPasswordResetID,
+    'deletePasswordResetID': deletePasswordResetID,
     'resetPassword': resetPassword,
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType,

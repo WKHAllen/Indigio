@@ -704,3 +704,7 @@ a:focus {
 .space-above {
     margin-top: var(--std-padding);
 }
+
+.space-below {
+    margin-bottom: var(--std-padding);
+}
