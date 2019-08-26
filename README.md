@@ -1,10 +1,24 @@
 # Indigio
 
-Indigio is an open source chatting app, and it's available on the web and as a desktop application.
+Indigio is an open source chatting app, and it is available on the web and as a desktop application.
+
+## Details
+
+### Security
+
+HTTPS is enforced throughout the site, so all traffic is secure.
+
+### Password Security
+
+Passwords are stored as bcrypt hashes. For more information on why I used bcrypt, [see this article](https://codahale.com/how-to-safely-store-a-password/).
+
+### Password Reset Security
+
+For security purposes, password reset IDs expire after an hour.
 
 ## Deployment
 
-Indigio is currently deployed on Heroku [here](https://indigio.herokuapp.com/). Several problems still exist, so it may take a bit of time before Heroku is able to fully deploy it.
+Indigio is currently deployed at [indigio.co](https://www.indigio.co/). The app is functional, although there are still many things I would like to add to it.
 
 ## Browser Compatibility
 
@@ -14,6 +28,6 @@ In the future, it will be tested in Safari as well.
 
 It is highly recommended that users use Chrome if the desktop app is not preferable.
 
-## Security concerns
+## Contributing
 
-At the moment, the application is not as secure as it should be. It is not recommended that it be used for secure communication. In the future these security issues will be fixed.
+If you would like to request a feature or report a problem, please [create an issue here](https://github.com/WKHAllen/Indigio/issues).
