@@ -44,10 +44,10 @@ async function build(platform, arch) {
 async function main() {
     var builds = [
         ['win32', 'ia32'],
-        ['win32', 'x64'],
+        // ['win32', 'x64'],
         // ['darwin', 'x64'], // (node:14820) UnhandledPromiseRejectionWarning: TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be one of type string, Buffer, or URL. Received type undefined
         ['linux', 'ia32'],
-        ['linux', 'x64']
+        // ['linux', 'x64']
     ];
     for (var b of builds) {
         await build(b[0], b[1]);

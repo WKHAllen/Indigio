@@ -1,3 +1,4 @@
+if (require('electron-squirrel-startup')) return;
 const { app, BrowserWindow, globalShortcut } = require('electron');
 const path = require('path');
 
@@ -25,7 +26,7 @@ function createWindow() {
         }
     });
     win.removeMenu();
-    win.loadURL('https://indigio.herokuapp.com');
+    win.loadURL('https://www.indigio.co');
     win.on('closed', () => {
         win = null
     });

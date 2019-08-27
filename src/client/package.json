@@ -12,6 +12,7 @@
     "electron": "^5.0.7"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "open": "^6.4.0"
   }
 }
