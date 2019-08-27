@@ -14,6 +14,8 @@ const dmRoomType = 0;
 
 const url = window.location.host;
 
+const inGoodBrowser = (navigator.userAgent.indexOf('Chrome') !== -1 || navigator.userAgent.indexOf('Electron') !== -1) && navigator.userAgent.indexOf('Edge') === -1;
+
 if (localStorage.getItem(localSettings) === null)
     localStorage.setItem(localSettings, JSON.stringify(defaultSettings));
 

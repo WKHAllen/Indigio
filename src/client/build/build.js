@@ -32,9 +32,9 @@ async function packageAll(options) {
     await packageApp('all', options);
 }
 
-async function packageZip(packageDir, options) {
+async function packageZip(packageDir) {
     var src = `build/${packageDir}`;
-    var dest = `dist/${packageDir}/${appName}-${options.version}.zip`;
+    var dest = `dist/${packageDir}/${appName}.zip`;
     const archive = archiver('zip', { zlib: { level: 9 }});
     const stream = fs.createWriteStream(dest);
     return new Promise((resolve, reject) => {
@@ -64,7 +64,7 @@ async function buildWindows(options) {
             'name': appName,
             'iconUrl': 'https://www.indigio.co/favicon.ico',
             'setupIcon': iconFile,
-            'setupExe': `${appName}-${options.version}-setup.exe`,
+            'setupExe': `${appName}-setup.exe`,
             'noMsi': true
         };
         await windowsInstaller.createWindowsInstaller(windowsOptions);

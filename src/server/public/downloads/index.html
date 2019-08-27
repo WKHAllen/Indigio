@@ -28,18 +28,30 @@
             </ul>
         </div>
         <div class="main-div">
-            <h1 class="centered-text">Downloads</h1>
+            <h1 class="centered-text">Download Indigio</h1>
             <div class="middle-content">
                 <div id="no-downloads" class="invisible">
                     <p>Looks like you already have the app! No need to download anything.</p>
                 </div>
+                <div class="invisible">
+                    <a id="download-link"><button>Download</button></a>
+                    <p class="space-above">This button will download the version of Indigio that works with your machine. Other downloads can be seen below.</p>
+                </div>
+                <div id="platform-not-supported" class="invisible">
+                    <p>Unfortunately, there isn't yet a download for your operating system. This will probably change in the near future, so please check back here soon. In the mean time, feel free to use <a href="/">the browser version of the app</a>.</p>
+                </div>
                 <div>
-                    <button id="download-button" onclick="document.getElementById('downloads').classList.remove('invisible');">Download</button>
+                    <h2>Windows</h2>
+                    <a href="https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio-setup.exe">Download installer</a><br>
+                    <a href="https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio.zip">Download zip</a>
+                    <h2>Mac</h2>
+                    <p>Coming soon</p>
+                    <h2>Linux</h2>
+                    <p>Coming soon</p>
                 </div>
-                <div id="downloads" class="invisible">
-                    Downloads will appear here in the near future. In the mean time, please use the app in your browser.
+                <div class="space-above">
+                    <button class="space-above" onclick="goBack();">Return</button>
                 </div>
-                <button class="space-above" onclick="goBack();">Return</button>
             </div>
         </div>
     </body>
