@@ -1,4 +1,5 @@
 const packager = require('electron-packager');
+const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
 
@@ -31,6 +32,21 @@ async function packageAll(options) {
     await packageApp('all', options);
 }
 
+async function packageZip(packageDir, options) {
+    var src = `build/${packageDir}`;
+    var dest = `dist/${packageDir}/${appName}-${options.version}.zip`;
+    const archive = archiver('zip', { zlib: { level: 9 }});
+    const stream = fs.createWriteStream(dest);
+    return new Promise((resolve, reject) => {
+        archive
+            .directory(src, false)
+            .on('error', err => reject(err))
+            .pipe(stream);
+        stream.on('close', () => resolve());
+        archive.finalize();
+    });
+}
+
 async function buildWindows(options) {
     const windowsInstaller = require('electron-winstaller');
     var packagePaths = await packageApp('win32', options);
@@ -52,6 +68,7 @@ async function buildWindows(options) {
             'noMsi': true
         };
         await windowsInstaller.createWindowsInstaller(windowsOptions);
+        await packageZip(packageDir, options);
     }
 }
 
@@ -73,6 +90,7 @@ async function buildDarwin(options) {
         darwinInstaller(darwinOptions, (err) => {
             if (err) throw err;
         });
+        await packageZip(packageDir, options);
     }
 }
 
@@ -97,6 +115,7 @@ async function buildLinux(options) {
             'icon': iconFile
         };
         await linuxInstaller(linuxOptions);
+        await packageZip(packageDir, options);
     }
 }
 

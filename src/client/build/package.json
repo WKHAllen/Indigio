@@ -13,5 +13,8 @@
     "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.0.4",
     "electron-winstaller": "^4.0.0"
+  },
+  "dependencies": {
+    "archiver": "^3.1.1"
   }
 }
