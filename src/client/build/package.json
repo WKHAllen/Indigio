@@ -10,6 +10,7 @@
   "author": "Will Allen",
   "license": "MIT",
   "devDependencies": {
+    "electron-installer-dmg": "^3.0.0",
     "electron-packager": "^14.0.4",
     "electron-winstaller": "^4.0.0"
   }
