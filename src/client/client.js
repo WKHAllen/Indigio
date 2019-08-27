@@ -5,6 +5,12 @@ const path = require('path');
 var win;
 
 var assetsDir = 'assets';
+var iconFile = 'favicon.ico';
+if (process.platform === 'darwin') {
+    iconFile = 'favicon.icns';
+} else if (process.platform === 'linux') {
+    iconFile = 'favicon.png';
+}
 
 function toggleKiosk() {
     win.setKiosk(!win.isKiosk());
@@ -17,7 +23,7 @@ function createWindow() {
         center: true,
         frame: false,
         title: 'Indigio',
-        icon: path.join(__dirname, assetsDir, 'favicon.ico'),
+        icon: path.join(__dirname, assetsDir, iconFile),
         backgroundColor: '#001f4f',
         darkTheme: true,
         webPreferences: {
