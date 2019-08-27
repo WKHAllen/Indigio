@@ -44,24 +44,21 @@
 }
 
 ::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-}
-
-::-webkit-scrollbar-track {
-    background-color: rgba(127, 191, 255, 0.1);
+    width: calc(var(--std-padding) * 0.75);
+    z-index: 1000;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: var(--tertiary-text-color);
+    background-color: rgba(63, 95, 223, 0.5);
     border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--tertiary-text-hover);
+    background-color: rgba(95, 127, 239, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:active {
-    background-color: var(--tertiary-text-active);
+    background-color: rgba(127, 159, 255, 0.5);
 }
 
 ::-moz-selection {
@@ -232,7 +229,11 @@ a:focus {
 .main-div {
     padding: calc(2 * var(--std-padding));
     height: calc(100% - var(--menu-bar-height) - 4 * var(--std-padding));
-    overflow-y: scroll;
+    overflow: hidden;
+}
+
+.main-div:hover {
+    overflow: overlay;
 }
 
 #menu-bar {
@@ -371,12 +372,17 @@ a:focus {
     width: 100%;
     height: 100%;
     list-style-type: none;
-    overflow-y: scroll;
+    overflow: hidden;
+}
+
+#room-list:hover {
+    overflow: overlay;
 }
 
 #room-list li {
-    height: var(--room-li-height);
-    line-height: var(--room-li-height);
+    height: calc(var(--room-li-height) - 2 * var(--std-padding));
+    line-height: calc(var(--room-li-height) - 2 * var(--std-padding));
+    padding: var(--std-padding);
 }
 
 #room-list li:hover {
@@ -384,14 +390,14 @@ a:focus {
 }
 
 #room-list li img {
-    width: var(--room-li-img-height);
-    height: var(--room-li-img-height);
-    padding: calc((var(--room-li-height) - var(--room-li-img-height)) / 2);
+    width: calc(var(--room-li-height) - 2 * var(--std-padding));
+    height: calc(var(--room-li-height) - 2 * var(--std-padding));
     float: left;
 }
 
 #room-list li span {
     width: calc(100% - var(--room-li-height));
+    padding: 0 var(--std-padding);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -449,7 +455,11 @@ a:focus {
     width: calc(100% - 2 * var(--std-padding));
     height: calc(100% - var(--input-height) - 2 * var(--std-padding));
     padding: var(--std-padding);
-    overflow-y: scroll;
+    overflow: hidden;
+}
+
+#messages:hover {
+    overflow: overlay;
 }
 
 .message {
