@@ -9,8 +9,12 @@ function setOS(os) {
 }
 
 function main() {
-    if (isElectron)
+    if (isElectron) {
         document.getElementById('no-downloads').classList.remove('invisible');
+        var downloadLinks = document.getElementById('downloads').getElementsByTagName('a');
+        for (var link of downloadLinks)
+            electronifyLink(link);
+    }
     if (navigator.appVersion.indexOf('Win') != -1) setOS('Windows');
     else if (navigator.appVersion.indexOf('Mac') != -1) setOS('MacOS');
     else if (navigator.appVersion.indexOf('Linux') != -1) setOS('Linux');
