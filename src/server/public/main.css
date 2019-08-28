@@ -614,7 +614,11 @@ a:focus {
     background-color: var(--menu-dark-color);
     width: 100%;
     max-height: var(--std-scrollarea-height);
-    overflow-y: scroll;
+    overflow: hidden;
+}
+
+.std-panel:hover {
+    overflow: overlay;
 }
 
 .std-panel ul {
