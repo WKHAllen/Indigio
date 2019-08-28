@@ -20,7 +20,7 @@ async function packageApp(platform, options) {
         'asar': false,
         'executableName': appName,
         'icon': iconFile,
-        'ignore': ['build', 'README.md'],
+        'ignore': ['build', 'dist', 'README.md'],
         'name': appName,
         'out': 'build',
         'overwrite': true

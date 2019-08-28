@@ -1,9 +1,8 @@
 window.addEventListener('load', () => {
     if (isElectron) {
-        var repoLink = document.getElementById('repo-link');
-        electronifyLink(repoLink);
+        electronifyLink(document.getElementById('repo-link'));
+        electronifyLink(document.getElementById('browser-app-link'));
     }
-    if (!inGoodBrowser) {
+    if (!inGoodBrowser)
         document.getElementById('browser-warning').classList.remove('invisible');
-    }
 });
