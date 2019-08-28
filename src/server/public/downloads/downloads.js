@@ -1,8 +1,29 @@
+function getOS() {
+    if (navigator.appVersion.indexOf('Win') !== -1) return 'Windows';
+    else if (navigator.appVersion.indexOf('Mac') !== -1) return 'MacOS';
+    else if (navigator.appVersion.indexOf('Linux') !== -1) return 'Linux';
+    else return null;
+}
+
+function getArch(os) {
+    if (os === 'Windows') {
+        if (navigator.userAgent.indexOf("WOW64") !== -1 || navigator.userAgent.indexOf("Win64") !== -1)
+            return '64';
+        else
+            return '32';
+    }
+}
+
 function setOS(os) {
+    var arch = getArch(os);
     var downloadLink = document.getElementById('download-link');
-    downloadLink.getElementsByTagName('button')[0].innerText = `Download for ${os}`;
-    if (os === 'Windows')
-        downloadLink.href = 'https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio-setup.exe';
+    downloadLink.getElementsByTagName('button')[0].innerText = `Download for ${os} (${arch} bit)`;
+    if (os === 'Windows') {
+        if (arch === '64')
+            downloadLink.href = 'https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio-win32-x64-setup.exe';
+        else
+            downloadLink.href = 'https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio-win32-ia32-setup.exe';
+    }
     if (isElectron && downloadLink.href)
         electronifyLink(downloadLink);
     downloadLink.parentNode.classList.remove('invisible');
@@ -15,10 +36,11 @@ function main() {
         for (var link of downloadLinks)
             electronifyLink(link);
     }
-    if (navigator.appVersion.indexOf('Win') != -1) setOS('Windows');
-    else if (navigator.appVersion.indexOf('Mac') != -1) setOS('MacOS');
-    else if (navigator.appVersion.indexOf('Linux') != -1) setOS('Linux');
-    else document.getElementById('platform-not-supported').classList.remove('invisible');
+    var os = getOS();
+    if (os !== null)
+        setOS(os);
+    else
+        document.getElementById('platform-not-supported').classList.remove('invisible');
 }
 
 window.addEventListener('load', main);
