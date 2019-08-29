@@ -72,6 +72,12 @@
 * {
     margin: 0;
     padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 html {
@@ -230,6 +236,15 @@ a:focus {
     padding: calc(2 * var(--std-padding));
     height: calc(100% - var(--menu-bar-height) - 4 * var(--std-padding));
     overflow: hidden;
+}
+
+.main-div * {
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 .main-div:hover {
@@ -451,6 +466,15 @@ a:focus {
     height: calc(100vh - var(--menu-bar-height));
 }
 
+#current-room * {
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
 #messages {
     width: calc(100% - 2 * var(--std-padding));
     height: calc(100% - var(--input-height) - 2 * var(--std-padding));
@@ -521,7 +545,9 @@ a:focus {
     padding-left: 25px;
     margin-top: var(--std-padding);
     cursor: pointer;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
+    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
