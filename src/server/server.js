@@ -45,7 +45,7 @@ function getDisplayname(socket, username) {
 }
 
 function setDisplayname(username, data) {
-    if ('displayname' in data)
+    if ('displayname' in data && data.displayname.match(/^.{3,32}$/g) !== null)
         database.setUserDisplayname(username, data.displayname);
 }
 
@@ -63,12 +63,12 @@ function getImage(socket, username, data) {
 }
 
 function setImage(username, data) {
-    if ('image' in data)
+    if ('image' in data && data.image.length <= 256)
         database.setUserImage(username, data.image);
 }
 
 function setPassword(username, data) {
-    if ('password' in data)
+    if ('password' in data && data.password.length >= 8 && data.password.length <= 64)
         database.setUserPassword(username, data.password);
 }
 
@@ -207,7 +207,7 @@ function getMoreMessages(socket, username, data) {
 
 function newMessage(username, data) {
     if ('roomid' in data && 'text' in data) {
-        if (typeof data.text === 'string' && data.text.length <= 1000) {
+        if (typeof data.text === 'string' && data.text.length <= 1024) {
             database.userInRoom(username, data.roomid, (res) => {
                 if (res) {
                     database.getRoomType(data.roomid, (roomType) => {
@@ -274,7 +274,7 @@ function getRoomName(socket, username, data) {
 }
 
 function setRoomName(username, data) {
-    if ('roomid' in data && 'roomName' in data) {
+    if ('roomid' in data && 'roomName' in data && data.roomName.length >= 3 && data.roomName.length <= 32) {
         database.userInRoom(username, data.roomid, (res) => {
             if (res) {
                 database.setRoomName(data.roomid, data.roomName);
@@ -298,7 +298,7 @@ function getRoomImage(socket, username, data) {
 }
 
 function setRoomImage(username, data) {
-    if ('roomid' in data && 'roomImage' in data) {
+    if ('roomid' in data && 'roomImage' in data && data.roomImage.length <= 256) {
         database.userInRoom(username, data.roomid, (res) => {
             if (res) {
                 database.setRoomImage(data.roomid, data.roomImage);
@@ -517,7 +517,7 @@ function getMessageInfo(socket, username, data) {
 }
 
 function editMessage(username, data) {
-    if ('messageid' in data && 'messageContent' in data) {
+    if ('messageid' in data && 'messageContent' in data && data.messageContent.length <= 1024) {
         database.canManageMessage(username, data.messageid, (res) => {
             if (res) {
                 database.roomOfMessage(data.messageid, (roomID) => {
@@ -596,10 +596,10 @@ function main(socket, username) {
 
 function register(socket, data) {
     if ('username' in data && 'displayname' in data && 'email' in data && 'password' in data) {
-        if (typeof data.username === 'string' && 2 <= data.username.length && data.username.length <= 32) {
-            if (typeof data.displayname === 'string' && 2 <= data.displayname.length && data.displayname.length <= 32) {
-                if (typeof data.email === 'string' && data.email.length <= 32 && data.email.match(/^([A-Za-z0-9.]+)@([a-z0-9]+)\.([a-z]+)$/g) !== null) {
-                    if (typeof data.password === 'string' && 8 <= data.password.length && data.password.length <= 32) {
+        if (typeof data.username === 'string' && data.username.length >= 3 && data.username.length <= 32 && data.username.match(/^(\w|\.){3,32}$/g) !== null) {
+            if (typeof data.displayname === 'string' && data.displayname.length >= 3 && data.displayname.length <= 32 && data.displayname.match(/^.{3,32}$/g) !== null) {
+                if (typeof data.email === 'string' && data.email.length <= 64 && data.email.match(/^([A-Za-z0-9.]+)@([a-z0-9]+)\.([a-z]+)$/g) !== null) {
+                    if (typeof data.password === 'string' && data.password.length >= 8 && data.password.length <= 32) {
                         database.createUser(data.username, data.displayname, data.email, data.password, (res) => {
                             socket.emit('validRegistration', { 'res': res });
                         });
@@ -610,10 +610,10 @@ function register(socket, data) {
                     socket.emit('validRegistration', { 'res': false, 'error': 'email must be less than 32 characters, and must be in the proper format' });
                 }
             } else {
-                socket.emit('validRegistration', { 'res': false, 'error': 'displayname must be between 2 and 32 characters' });
+                socket.emit('validRegistration', { 'res': false, 'error': 'displayname must be between 3 and 32 characters' });
             }
         } else {
-            socket.emit('validRegistration', { 'res': false, 'error': 'username must be between 2 and 32 characters' });
+            socket.emit('validRegistration', { 'res': false, 'error': 'username must be between 3 and 32 characters, and can only contain letters, numbers, underscores, and periods' });
         }
     } else {
         socket.emit('validRegistration', { 'res': false, 'error': 'username, displayname, email, password expected' });

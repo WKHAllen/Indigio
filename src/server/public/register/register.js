@@ -6,22 +6,22 @@ function showError(msg) {
 
 function getUsername() {
     var username = stripWhitespace(document.getElementById('username').value);
-    var res = username.match(/^\w{3,32}$/g);
+    var res = username.match(/^(\w|\.){3,32}$/g);
     if (res !== null) {
         return username;
     } else {
-        showError('Dsername must be between 3 and 32 characters, and can only contain letters, numbers, and underscores');
+        showError('Username must be between 3 and 32 characters, and can only contain letters, numbers, underscores, and periods');
         return null;
     }
 }
 
 function getDisplayname() {
     var displayname = stripWhitespace(document.getElementById('displayname').value);
-    var res = displayname.match(/^\w{3,32}$/g);
+    var res = displayname.match(/^.{3,32}$/g);
     if (res !== null) {
         return displayname;
     } else {
-        showError('Display name must be between 3 and 32 characters, and can only contain letters, numbers, and underscores');
+        showError('Display name must be between 3 and 32 characters');
         return null;
     }
 }
@@ -29,7 +29,7 @@ function getDisplayname() {
 function getEmail() {
     var email = stripWhitespace(document.getElementById('email').value);
     var res = email.match(/^([A-Za-z0-9.]+)@([a-z0-9]+)\.([a-z]+)$/g);
-    if (res !== null) {
+    if (res !== null && email.length <= 64) {
         return email;
     } else {
         showError('Email address is invalid');

@@ -4,21 +4,26 @@ function setDisplayname() {
     var status = document.getElementById('displayname-status');
     status.style.color = 'var(--primary-text-color)';
     status.innerText = 'Changing name...';
-    var socket = io.connect(url, { secure: true });
-    socket.emit('login', { 'username': username, 'password': password });
-    socket.on('validLogin', (data) => {
-        if (data.res) {
-            socket.emit('setDisplayname', { 'displayname': displayname });
-            status.style.color = 'var(--success-text-color)';
-            status.innerText = 'Name change successful';
-            document.getElementById('displayname-label').innerText = displayname;
-        } else {
-            status.style.color = 'var(--error-text-color)';
-            status.innerText = 'Failed to change name';
-        }
-        document.getElementById('displayname-button').disabled = false;
-        socket.disconnect();
-    });
+    if (displayname.match(/^.{3,32}$/g) !== null) {
+        var socket = io.connect(url, { secure: true });
+        socket.emit('login', { 'username': username, 'password': password });
+        socket.on('validLogin', (data) => {
+            if (data.res) {
+                socket.emit('setDisplayname', { 'displayname': displayname });
+                status.style.color = 'var(--success-text-color)';
+                status.innerText = 'Name change successful';
+                document.getElementById('displayname-label').innerText = displayname;
+            } else {
+                status.style.color = 'var(--error-text-color)';
+                status.innerText = 'Failed to change name';
+            }
+            document.getElementById('displayname-button').disabled = false;
+            socket.disconnect();
+        });
+    } else {
+        status.style.color = 'var(--error-text-color)';
+        status.innerText = 'Display name must be between 3 and 32 characters';
+    }
 }
 
 function setImage() {
@@ -61,7 +66,7 @@ function setPassword() {
         return;
     } else {
         var res = pass.match(/^.{8,64}$/g);
-        if (res === null) {
+        if (res === null || pass.length < 8 || pass.length > 64) {
             status.style.color = 'var(--error-text-color)';
             status.innerText = 'Password must be between 8 and 64 characters';
             return;

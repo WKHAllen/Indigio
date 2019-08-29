@@ -43,19 +43,19 @@
                 </table>
                 <div class="settings-option">
                     <label for="room-name">Change room name</label>
-                    <input type="text" id="room-name" maxlength="32" onkeydown="onEnterClick('room-name-button');">
+                    <input type="text" id="room-name" minlength="3" maxlength="32" onkeydown="onEnterClick('room-name-button');">
                     <button type="button" id="room-name-button" class="space-above" onclick="setRoomName();">Set name</button>
                     <span id="room-name-status"></span>
                 </div>
                 <div class="settings-option">
                     <label for="room-image">Change room image URL</label>
-                    <input type="text" id="room-image" onkeydown="onEnterClick('room-image-button');">
+                    <input type="text" id="room-image" maxlength="256" onkeydown="onEnterClick('room-image-button');">
                     <button type="button" id="room-image-button" class="space-above" onclick="setRoomImage();">Set image</button>
                     <span id="room-image-status"></span>
                 </div>
                 <div class="settings-option">
                     <label for="add-member">Add member to room by username</label>
-                    <input type="text" id="add-member" maxlength="32" onkeydown="onEnterClick('add-member-button');">
+                    <input type="text" id="add-member" minlength="3" maxlength="32" onkeydown="onEnterClick('add-member-button');">
                     <button type="button" id="add-member-button" class="space-above" onclick="addRoomMember();">Add member</button>
                     <span id="add-member-status"></span>
                 </div>

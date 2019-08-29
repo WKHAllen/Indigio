@@ -6,11 +6,10 @@ var win;
 
 var assetsDir = 'assets';
 var iconFile = 'favicon.ico';
-if (process.platform === 'darwin') {
+if (process.platform === 'darwin')
     iconFile = 'favicon.icns';
-} else if (process.platform === 'linux') {
+else if (process.platform === 'linux')
     iconFile = 'favicon.png';
-}
 
 function toggleKiosk() {
     win.setKiosk(!win.isKiosk());

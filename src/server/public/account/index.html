@@ -47,21 +47,21 @@
                 </table>
                 <div class="settings-option">
                     <label for="displayname">Change display name</label>
-                    <input type="text" id="displayname" maxlength="32" onkeydown="onEnterClick('displayname-button');">
+                    <input type="text" id="displayname" minlength="3" maxlength="32" onkeydown="onEnterClick('displayname-button');">
                     <button type="button" id="displayname-button" class="space-above" onclick="setDisplayname();">Set name</button>
                     <span id="displayname-status"></span>
                 </div>
                 <div class="settings-option">
                     <label for="image">Change image URL</label>
-                    <input type="text" id="image" onkeydown="onEnterClick('image-button');">
+                    <input type="text" id="image" maxlength="256" onkeydown="onEnterClick('image-button');">
                     <button type="button" id="image-button" class="space-above" onclick="setImage();">Set image</button>
                     <span id="image-status"></span>
                 </div>
                 <div class="settings-option">
                     <label for="password">Change password</label>
-                    <input type="password" id="password" onkeydown="onEnterClick('password-button');">
+                    <input type="password" id="password" minlength="8" maxlength="64" onkeydown="onEnterClick('password-button');">
                     <label for="password-confirm">Confirm password</label>
-                    <input type="password" id="password-confirm" onkeydown="onEnterClick('password-button');">
+                    <input type="password" id="password-confirm" minlength="8" maxlength="64" onkeydown="onEnterClick('password-button');">
                     <button type="button" id="password-button" class="space-above" onclick="setPassword();">Set password</button>
                     <span id="password-status"></span>
                 </div>

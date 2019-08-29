@@ -6,21 +6,26 @@ function setRoomName() {
     var status = document.getElementById('room-name-status');
     status.style.color = 'var(--primary-text-color)';
     status.innerText = 'Changing room name...';
-    var socket = io.connect(url, { secure: true });
-    socket.emit('login', { 'username': username, 'password': password });
-    socket.on('validLogin', (data) => {
-        if (data.res) {
-            socket.emit('setRoomName', { 'roomid': roomID, 'roomName': roomName });
-            status.style.color = 'var(--success-text-color)';
-            status.innerText = 'Room name change successful';
-            document.getElementById('room-name-label').innerText = roomName;
-        } else {
-            status.style.color = 'var(--error-text-color)';
-            status.innerText = 'Failed to change room name';
-        }
-        document.getElementById('room-name-button').disabled = false;
-        socket.disconnect();
-    });
+    if (roomName.length >= 3 && roomName.length <= 32) {
+        var socket = io.connect(url, { secure: true });
+        socket.emit('login', { 'username': username, 'password': password });
+        socket.on('validLogin', (data) => {
+            if (data.res) {
+                socket.emit('setRoomName', { 'roomid': roomID, 'roomName': roomName });
+                status.style.color = 'var(--success-text-color)';
+                status.innerText = 'Room name change successful';
+                document.getElementById('room-name-label').innerText = roomName;
+            } else {
+                status.style.color = 'var(--error-text-color)';
+                status.innerText = 'Failed to change room name';
+            }
+            document.getElementById('room-name-button').disabled = false;
+            socket.disconnect();
+        });
+    } else {
+        status.style.color = 'var(--error-text-color)';
+        status.innerText = 'Room name must be between 3 and 32 characters';
+    }
 }
 
 function setRoomImage() {
