@@ -31,7 +31,7 @@ function createWindow() {
         }
     });
     win.removeMenu();
-    win.loadURL('https://www.indigio.co');
+    win.loadURL('https://indigio.herokuapp.com/');
     win.on('closed', () => {
         win = null
     });
