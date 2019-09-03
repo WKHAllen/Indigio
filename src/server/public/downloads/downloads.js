@@ -11,13 +11,19 @@ function getArch(os) {
             return '64';
         else
             return '32';
+    } else if (os === 'MacOS') {
+        return '64';
     }
 }
 
 function setOS(os) {
     var arch = getArch(os);
     var downloadLink = document.getElementById('download-link');
-    downloadLink.getElementsByTagName('button')[0].innerText = `Download for ${os} (${arch} bit)`;
+    if (arch !== undefined) {
+        downloadLink.getElementsByTagName('button')[0].innerText = `Download for ${os} (${arch} bit)`;
+    } else {
+        downloadLink.getElementsByTagName('button')[0].innerText = `Download for ${os}`;
+    }
     if (os === 'Windows') {
         if (arch === '64')
             downloadLink.href = 'https://github.com/WKHAllen/Indigio/releases/latest/download/Indigio-win32-x64-setup.exe';
