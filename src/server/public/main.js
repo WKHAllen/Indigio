@@ -334,6 +334,7 @@ function main() {
 
 function start() {
     socket = io.connect(url, { secure: true });
+    socket.on('reconnect', (attemptNumber) => { window.location.reload(); });
     socket.emit('login', { 'username': username, 'password': password });
     socket.on('validLogin', (data) => {
         if (!data.res) {
