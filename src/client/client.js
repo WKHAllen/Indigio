@@ -1,4 +1,4 @@
-if (require('electron-squirrel-startup')) return;
+if (require('electron-squirrel-startup')) process.exit();
 const { app, BrowserWindow, globalShortcut } = require('electron');
 const path = require('path');
 
