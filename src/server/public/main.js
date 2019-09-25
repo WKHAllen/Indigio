@@ -109,6 +109,13 @@ function addNewRoomAbove(parentElement, roomData) {
     parentElement.insertBefore(newRoom, parentElement.children[1]);
 }
 
+function shrugify(messageText) {
+    while (messageText.includes('/shrug')) {
+        messageText = messageText.replace('/shrug', '¯\\_(ツ)_/¯');
+    }
+    return messageText;
+}
+
 function linkify(messageContentElement, messageText) {
     var remainingMessage = messageText;
     var textElement, linkElement;
@@ -155,32 +162,42 @@ function linkify(messageContentElement, messageText) {
     } while (remainingMessage.length > 0);
 }
 
+function emojify(messageContent) {
+    var textElements = messageContent.getElementsByTagName('span');
+    for (var textElement of textElements) {
+        textElement.innerText = emojione.toImage(textElement.innerText);
+    }
+}
+
 function buildMessage(messageData) {
     var newMessage = document.createElement('div');
     newMessage.classList.add('message');
     newMessage.setAttribute('id', `message-${messageData.id}`);
     // Image
-    messageImg = document.createElement('img');
+    var messageImg = document.createElement('img');
     messageImg.setAttribute('src', messageData.imageurl);
     messageImg.setAttribute('onclick', `viewProfileByUsername('${messageData.username}');`);
     messageImg.style.cursor = 'pointer';
     newMessage.appendChild(messageImg);
     // Displayname
-    messageDisplayname = document.createElement('span');
+    var messageDisplayname = document.createElement('span');
     messageDisplayname.classList.add('displayname');
     messageDisplayname.innerText = messageData.displayname + ' ';
     messageDisplayname.setAttribute('onclick', `viewProfileByUsername('${messageData.username}');`);
     messageDisplayname.style.cursor = 'pointer';
     newMessage.appendChild(messageDisplayname);
     // Timestamp
-    messageTimestamp = document.createElement('span');
+    var messageTimestamp = document.createElement('span');
     messageTimestamp.classList.add('timestamp');
     messageTimestamp.innerText = new Date(messageData.timestamp * 1000).toLocaleString() + ' ';
     newMessage.appendChild(messageTimestamp);
     // Content
-    messageContent = document.createElement('span');
+    var messageContent = document.createElement('span');
     messageContent.classList.add('message-content');
-    linkify(messageContent, messageData.text);
+    var messageText = messageData.text;
+    messageText = shrugify(messageText);
+    linkify(messageContent, messageText);
+    emojify(messageContent);
     newMessage.appendChild(messageContent);
     if (messageData.username === username) {
         newMessage.addEventListener('contextmenu', (e) => {
