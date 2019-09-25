@@ -165,7 +165,7 @@ function linkify(messageContentElement, messageText) {
 function emojify(messageContent) {
     var textElements = messageContent.getElementsByTagName('span');
     for (var textElement of textElements) {
-        textElement.innerText = emojione.toImage(textElement.innerText);
+        textElement.innerHTML = emojione.toImage(textElement.innerText);
     }
 }
 
