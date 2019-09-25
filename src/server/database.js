@@ -103,6 +103,7 @@ function init() {
 }
 
 function createUser(username, displayname, email, password, callback) {
+    email = email.toLowerCase();
     var sql = `SELECT username, email FROM users WHERE username = ? OR email = ?;`;
     var params = [username, email];
     mainDB.execute(sql, params, (err, rows) => {
@@ -851,6 +852,7 @@ function readMessage(username, roomID) {
 }
 
 function emailExists(email, callback) {
+    email = email.toLowerCase();
     var sql = `SELECT email FROM users WHERE email = ?;`;
     var params = [email];
     mainDB.execute(sql, params, (err, rows) => {
@@ -860,6 +862,7 @@ function emailExists(email, callback) {
 }
 
 function newPasswordResetID(email, callback) {
+    email = email.toLowerCase();
     crypto.randomBytes(hexLength / 2, (err, buffer) => {
         if (err) throw err;
         var resetID = buffer.toString('hex');

@@ -43,6 +43,7 @@ function sendEmail(email, resetURL) {
 }
 
 function passwordReset(email, hostname) {
+    email = email.toLowerCase();
     database.newPasswordResetID(email, (resetID) => {
         var params = new URLSearchParams();
         params.set('resetID', resetID);
