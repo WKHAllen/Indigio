@@ -162,13 +162,6 @@ function linkify(messageContentElement, messageText) {
     } while (remainingMessage.length > 0);
 }
 
-function emojify(messageContent) {
-    var textElements = messageContent.getElementsByTagName('span');
-    for (var textElement of textElements) {
-        textElement.innerText = emojione.toImage(textElement.innerText);
-    }
-}
-
 function buildMessage(messageData) {
     var newMessage = document.createElement('div');
     newMessage.classList.add('message');
@@ -197,7 +190,6 @@ function buildMessage(messageData) {
     var messageText = messageData.text;
     messageText = shrugify(messageText);
     linkify(messageContent, messageText);
-    emojify(messageContent);
     newMessage.appendChild(messageContent);
     if (messageData.username === username) {
         newMessage.addEventListener('contextmenu', (e) => {
