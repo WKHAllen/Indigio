@@ -638,9 +638,17 @@ function login(socket, data) {
 function resetPassword(socket, data) {
     if ('email' in data) {
         database.emailExists(data.email, (res) => {
-            socket.emit('validPasswordReset', { 'res': res });
             if (res) {
-                passwordReset.passwordReset(data.email, address);
+                database.uniquePasswordResetEntry(data.email, (res) => {
+                    if (res) {
+                        socket.emit('validPasswordReset', { 'res': true });
+                        passwordReset.passwordReset(data.email, address);
+                    } else {
+                        socket.emit('validPasswordReset', { 'res': false, 'error': 'A password reset email has already been sent for this account' });
+                    }
+                });
+            } else {
+                socket.emit('validPasswordReset', { 'res': false, 'error': 'Email address is not registered' });
             }
         });
     } else {

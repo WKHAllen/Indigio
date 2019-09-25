@@ -44,8 +44,8 @@ function reset() {
         if (data.res) {
             socket.disconnect();
             window.location.replace('/');
-        } else {
-            showError('Email address is not registered');
+        } else if (data.error) {
+            showError(data.error);
             document.getElementById('reset-button').disabled = false;
             socket.disconnect();
         }

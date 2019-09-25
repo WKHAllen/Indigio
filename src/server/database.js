@@ -921,6 +921,15 @@ function resetPassword(passwordResetID, newPassword) {
     });
 }
 
+function uniquePasswordResetEntry(email, callback) {
+    var sql = `SELECT email FROM passwordReset WHERE email = ?;`;
+    var params = [email];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length === 0);
+    })
+}
+
 function verifyLogin(username, password, callback) {
     var sql = `SELECT username, password FROM users WHERE username = ? OR email = ?;`;
     var params = [username, username];
@@ -1003,6 +1012,7 @@ module.exports = {
     'checkPasswordResetID': checkPasswordResetID,
     'deletePasswordResetID': deletePasswordResetID,
     'resetPassword': resetPassword,
+    'uniquePasswordResetEntry': uniquePasswordResetEntry,
     'verifyLogin': verifyLogin,
     'dmRoomType': dmRoomType,
     'normalRoomType': normalRoomType,
