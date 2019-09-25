@@ -4,10 +4,10 @@ const database = require('./database');
 try {
     const loginInfo = require('./loginInfo');
     var indigioEmail = loginInfo.email;
-    var indigioPassword = loginInfo.password;
+    var indigioPassword = loginInfo.appPassword;
 } catch (err) {
     var indigioEmail = process.env.EMAIL_ADDRESS;
-    var indigioPassword = process.env.EMAIL_PASSWORD;
+    var indigioPassword = process.env.EMAIL_APP_PASSWORD;
 }
 
 const emailBodyFile = 'passwordReset.html';
