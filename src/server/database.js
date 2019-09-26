@@ -434,6 +434,18 @@ function removeOutgoingFriendRequest(username1, username2) {
     });
 }
 
+function hasFriendRequest(username, callback) {
+    var sql = `
+        SELECT id2 FROM friendRequests WHERE id2 = (
+            SELECT id FROM users WHERE username = ?
+        );`;
+    var params = [username];
+    mainDB.execute(sql, params, (err, rows) => {
+        if (err) throw err;
+        if (callback) callback(rows.length > 0);
+    });
+}
+
 function getDMRoomID(username1, username2, callback) {
     var sql = `
         SELECT commonRooms.roomid FROM (
@@ -978,6 +990,7 @@ module.exports = {
     'getOutgoingFriendRequests': getOutgoingFriendRequests,
     'newOutgoingFriendRequest': newOutgoingFriendRequest,
     'removeOutgoingFriendRequest': removeOutgoingFriendRequest,
+    'hasFriendRequest': hasFriendRequest,
     'getDMRoomID': getDMRoomID,
     'getOtherDMMemberUsername': getOtherDMMemberUsername,
     'createRoom': createRoom,

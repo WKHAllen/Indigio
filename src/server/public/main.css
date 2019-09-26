@@ -306,6 +306,18 @@ a:focus {
     box-shadow: none;
 }
 
+#menu-list li a button.notification {
+    background-color: var(--menu-unread);
+}
+
+#menu-list li a button.notification:hover {
+    background-color: var(--menu-unread-hover);
+}
+
+#menu-list li a button.notification:active {
+    background-color: var(--menu-unread-active);
+}
+
 .main-title {
     position: absolute;
     top: 0;

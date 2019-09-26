@@ -549,6 +549,12 @@ function readMessage(username, data) {
         database.readMessage(username, data.roomid);
 }
 
+function hasFriendRequest(socket, username) {
+    database.hasFriendRequest(username, (res) => {
+        socket.emit('returnHasFriendRequest', { 'res': res });
+    });
+}
+
 function main(socket, username) {
     socket.on('getDisplayname', () => { getDisplayname(socket, username); });
     socket.on('setDisplayname', (data) => { setDisplayname(username, data); });
@@ -592,6 +598,7 @@ function main(socket, username) {
     socket.on('editMessage', (data) => { editMessage(username, data); });
     socket.on('deleteMessage', (data) => { deleteMessage(username, data); });
     socket.on('readMessage', (data) => { readMessage(username, data); });
+    socket.on('hasFriendRequest', () => { hasFriendRequest(socket, username) });
 }
 
 function register(socket, data) {

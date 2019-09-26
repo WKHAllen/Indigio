@@ -104,3 +104,26 @@ function validImageURL(imageURL, callback) {
     xhttp.open('GET', imageURL, true);
     xhttp.send();
 }
+
+function checkFriendRequests() {
+    var socket = io.connect(url, { secure: true });
+    socket.emit('login', { 'username': username, 'password': password });
+    socket.on('validLogin', (data) => {
+        if (data.res) {
+            socket.emit('hasFriendRequest');
+            socket.on('returnHasFriendRequest', (data) => {
+                if (data.res) {
+                    var friendButton = document.getElementById('friends-link');
+                    friendButton.classList.add('notification');
+                }
+                socket.disconnect();
+            });
+        } else {
+            socket.disconnect();
+        }
+    });
+}
+
+if (io !== undefined && username !== null && password !== null) {
+    window.addEventListener('load', checkFriendRequests);
+}
