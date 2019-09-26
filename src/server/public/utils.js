@@ -114,7 +114,7 @@ function checkFriendRequests() {
             socket.on('returnHasFriendRequest', (data) => {
                 if (data.res) {
                     var friendButton = document.getElementById('friends-link');
-                    friendButton.classList.add('notification');
+                    friendButton.childNodes[0].childNodes[0].classList.add('notification');
                 }
                 socket.disconnect();
             });

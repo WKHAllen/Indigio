@@ -36,6 +36,9 @@
     --menu-unread: #4f1faf;
     --menu-unread-hover: #5f2fbf;
     --menu-unread-active: #6f3fcf;
+    --notification: #1f6fbf;
+    --notification-hover: #2f7fcf;
+    --notification-active: #3f8fdf;
     --input-color: #1f2fbf;
     --message-user-color: #00afff;
     --message-timestamp-color: #9f9fcf;
@@ -307,15 +310,15 @@ a:focus {
 }
 
 #menu-list li a button.notification {
-    background-color: var(--menu-unread);
+    background-color: var(--notification);
 }
 
 #menu-list li a button.notification:hover {
-    background-color: var(--menu-unread-hover);
+    background-color: var(--notification-hover);
 }
 
 #menu-list li a button.notification:active {
-    background-color: var(--menu-unread-active);
+    background-color: var(--notification-active);
 }
 
 .main-title {
