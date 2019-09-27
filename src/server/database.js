@@ -88,12 +88,9 @@ function init() {
             blocktimestamp INT NOT NULL
         );
     `;
-    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable, blockedUsersTable], (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.executeMany([usersTable, roomsTable, roomUsersTable, messagesTable, friendsTable, friendRequestsTable, passwordResetTable, blockedUsersTable]);
     var sql = `SELECT resetid, createtimestamp FROM passwordReset;`;
     mainDB.execute(sql, [], (err, rows) => {
-        if (err) throw err;
         var timeRemaining;
         for (var row of rows) {
             timeRemaining = row.createtimestamp + Math.floor(passwordResetTimeout / 1000) - getTime();
@@ -107,16 +104,13 @@ function createUser(username, displayname, email, password, callback) {
     var sql = `SELECT username, email FROM users WHERE username = ? OR email = ?;`;
     var params = [username, email];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length > 0) {
             if (callback) callback(false);
         } else {
             bcrypt.hash(password, saltRounds, (err, hash) => {
-                if (err) throw err;
                 sql = `INSERT INTO users (username, displayname, email, password, imageurl, jointimestamp) VALUES (?, ?, ?, ?, ?, ?);`;
                 params = [username, displayname, email, hash, defaultUserImageURL, getTime()];
                 mainDB.execute(sql, params, (err, rows) => {
-                    if (err) throw err;
                     if (callback) callback(true);
                 });
             });
@@ -128,9 +122,7 @@ function setUserPassword(username, newPassword) {
     bcrypt.hash(newPassword, saltRounds, (err, hash) => {
         var sql = `UPDATE users SET password = ? WHERE username = ?;`;
         var params = [hash, username];
-        mainDB.execute(sql, params, (err, rows) => {
-            if (err) throw err;
-        });
+        mainDB.execute(sql, params);
     });
 }
 
@@ -138,7 +130,6 @@ function getUserDisplayname(username, callback) {
     var sql = `SELECT displayname FROM users WHERE username = ?;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0].displayname);
     });
 }
@@ -146,16 +137,13 @@ function getUserDisplayname(username, callback) {
 function setUserDisplayname(username, newDisplayname) {
     var sql = `UPDATE users SET displayname = ? WHERE username = ?;`;
     var params = [newDisplayname, username];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getUserImage(username, callback) {
     var sql = `SELECT imageurl FROM users WHERE username = ?;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0].imageurl);
     });
 }
@@ -163,16 +151,13 @@ function getUserImage(username, callback) {
 function setUserImage(username, imageurl) {
     var sql = `UPDATE users SET imageurl = ? WHERE username = ?;`;
     var params = [imageurl, username];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function userExists(username, callback) {
     var sql = `SELECT username FROM users WHERE username = ?;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -181,7 +166,6 @@ function getUserInfo(username, callback) {
     var sql = `SELECT username, displayname, imageurl FROM users WHERE username = ?;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) {
             if (rows.length === 1)
                 callback(rows[0]);
@@ -200,7 +184,6 @@ function isBlocked(username1, username2, callback) {
         );`;
     var params = [username1, username2];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -215,9 +198,7 @@ function blockUser(username1, username2) {
                     ?
                 );`;
             var params = [username1, username2, getTime()];
-            mainDB.execute(sql, params, (err, rows) => {
-                if (err) throw err;
-            });
+            mainDB.execute(sql, params);
         }
     });
 }
@@ -230,9 +211,7 @@ function unblockUser(username1, username2) {
             SELECT id FROM users WHERE username = ?
         );`;
     var params = [username1, username2];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getBlockedUsers(username, callback) {
@@ -244,7 +223,6 @@ function getBlockedUsers(username, callback) {
         ) blockedUsers1 ON users.id = blockedUsers1.id2;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -258,11 +236,9 @@ function addFriend(username1, username2) {
         );`;
     var params = [username1, username2];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length === 0) {
             params = [username2, username1];
             mainDB.execute(sql, params, (err, rows) => {
-                if (err) throw err;
                 if (rows.length === 0) {
                     var now = getTime();
                     sql = `
@@ -274,13 +250,9 @@ function addFriend(username1, username2) {
                             ?
                         );`;
                     params = [username1, username2, now];
-                    mainDB.execute(sql, params, (err, rows) => {
-                        if (err) throw err;
-                    });
+                    mainDB.execute(sql, params);
                     params = [username2, username1, now];
-                    mainDB.execute(sql, params, (err, rows) => {
-                        if (err) throw err;
-                    });
+                    mainDB.execute(sql, params);
                 }
             });
         }
@@ -295,13 +267,9 @@ function removeFriend(username1, username2) {
             SELECT id FROM users WHERE username = ?
         );`;
     var params = [username1, username2];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
     params = [username2, username1];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getFriends(username, callback) {
@@ -313,7 +281,6 @@ function getFriends(username, callback) {
         ) userFriends ON users.id = userFriends.id2;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -327,7 +294,6 @@ function checkIsFriend(username, friendUsername, callback) {
         );`;
     var params = [username, friendUsername];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -341,7 +307,6 @@ function getIncomingFriendRequests(username, callback) {
         ) userRequests ON users.id = userRequests.id1;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -360,9 +325,7 @@ function removeIncomingFriendRequest(username1, username2) {
             SELECT id FROM users WHERE username = ?
         );`;
     var params = [username1, username2];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getOutgoingFriendRequests(username, callback) {
@@ -374,7 +337,6 @@ function getOutgoingFriendRequests(username, callback) {
         ) userRequests ON users.id = userRequests.id2;`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -384,7 +346,6 @@ function newOutgoingFriendRequest(username1, username2) {
         var sql = `SELECT id FROM users WHERE username = ?;`;
         var params = [username2];
         mainDB.execute(sql, params, (err, rows) => {
-            if (err) throw err;
             if (rows.length > 0) {
                 sql = `
                     SELECT id2 FROM friendRequests WHERE id1 = (
@@ -400,7 +361,6 @@ function newOutgoingFriendRequest(username1, username2) {
                     );`;
                 params = [username1, username2, username1, username2];
                 mainDB.execute(sql, params, (err, rows) => {
-                    if (err) throw err;
                     if (rows.length === 0) {
                         sql = `
                             INSERT INTO friendRequests (
@@ -411,9 +371,7 @@ function newOutgoingFriendRequest(username1, username2) {
                                 ?
                             );`;
                         params = [username1, username2, getTime()];
-                        mainDB.execute(sql, params, (err, rows) => {
-                            if (err) throw err;
-                        });
+                        mainDB.execute(sql, params);
                     }
                 });
             }
@@ -429,9 +387,7 @@ function removeOutgoingFriendRequest(username1, username2) {
             SELECT id FROM users WHERE username = ?
         );`;
     var params = [username1, username2];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function hasFriendRequest(username, callback) {
@@ -441,7 +397,6 @@ function hasFriendRequest(username, callback) {
         );`;
     var params = [username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -463,7 +418,6 @@ function getDMRoomID(username1, username2, callback) {
         ) DMs ON commonRooms.roomid = DMs.id;`;
     var params = [username1, username2, dmRoomType];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) {
             if (rows.length > 0)
                 callback(rows[0].roomid);
@@ -484,7 +438,6 @@ function getOtherDMMemberUsername(roomID, username, callback) {
         ) rooms1 ON roomUsers1.roomid = rooms1.id;`;
     var params = [roomID, username, roomID, dmRoomType];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) {
             if (rows.length > 0)
                 callback(rows[0].username);
@@ -509,10 +462,7 @@ function createRoom(creatorUsername, roomtype, name, callback) {
     var now = getTime();
     var params = [creatorUsername, roomtype, name, defaultRoomImageURL, now, now];
     var sqlAfter = `SELECT id FROM rooms ORDER BY id DESC LIMIT 1;`;
-    mainDB.executeAfter(sql, params, (err, rows) => {
-        if (err) throw err;
-    }, sqlAfter, [], (err, rows) => {
-        if (err) throw err;
+    mainDB.executeAfter(sql, params, null, sqlAfter, [], (err, rows) => {
         if (callback && rows.length === 1) callback(rows[0].id);
     });
 }
@@ -520,17 +470,11 @@ function createRoom(creatorUsername, roomtype, name, callback) {
 function deleteRoom(roomID) {
     var sql = `DELETE FROM rooms WHERE id = ?;`;
     var params = [roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
     sql = `DELETE FROM roomUsers WHERE roomid = ?;`;
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
     sql = `DELETE FROM messages WHERE roomid = ?;`;
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function addToRoom(roomID, username, callback) {
@@ -540,7 +484,6 @@ function addToRoom(roomID, username, callback) {
         );`;
     var params = [roomID, username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length === 0) {
             sql = `
                 INSERT INTO roomUsers (
@@ -552,7 +495,6 @@ function addToRoom(roomID, username, callback) {
                 );`;
             params = [roomID, username, getTime()];
             mainDB.execute(sql, params, (err, rows) => {
-                if (err) throw err;
                 if (callback) callback();
             });
         }
@@ -566,7 +508,6 @@ function removeFromRoom(roomID, username, callback) {
         );`;
     var params = [roomID, username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback();
     });
 }
@@ -575,7 +516,6 @@ function getRoomName(roomID, callback) {
     var sql = `SELECT name FROM rooms WHERE id = ?;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0].name);
     });
 }
@@ -583,16 +523,13 @@ function getRoomName(roomID, callback) {
 function setRoomName(roomID, name) {
     var sql = `UPDATE rooms SET name = ? WHERE id = ?;`;
     var params = [name, roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getRoomImage(roomID, callback) {
     var sql = `SELECT imageurl FROM rooms WHERE id = ?;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0].imageurl);
     });
 }
@@ -600,16 +537,13 @@ function getRoomImage(roomID, callback) {
 function setRoomImage(roomID, imageurl) {
     var sql = `UPDATE rooms SET imageurl = ? WHERE id = ?;`;
     var params = [imageurl, roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function getRoomInfo(roomID, callback) {
     var sql = `SELECT * FROM rooms WHERE id = ?;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0]);
     });
 }
@@ -639,7 +573,6 @@ function getRooms(username, callback) {
         ) subq ORDER BY updatetimestamp DESC;`;
     var params = [dmRoomType, username, dmRoomType, username, username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -651,7 +584,6 @@ function getUsersInRoom(roomID, callback) {
         ) roomUsers1 ON users.id = roomUsers1.userid ORDER BY roomUsers1.jointimestamp ASC;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -663,7 +595,6 @@ function userInRoom(username, roomID, callback) {
         ) AND roomid = ?;`;
     var params = [username, roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -672,7 +603,6 @@ function getRoomType(roomID, callback) {
     var sql = `SELECT roomtype FROM rooms WHERE id = ?;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) {
             if (rows.length === 0) {
                 callback(null);
@@ -692,7 +622,6 @@ function getRoomCreator(roomID, callback) {
         ) rooms1 ON roomUsers1.roomid = rooms1.id AND users.id = rooms1.creatorid;`;
     var params = [roomID, roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) {
             if (rows.length === 1)
                 callback(rows[0].username);
@@ -704,7 +633,7 @@ function getRoomCreator(roomID, callback) {
 
 function isRoomCreator(username, roomID, callback) {
     getRoomCreator(roomID, (creatorUsername) => {
-        callback(username === creatorUsername);
+        if (callback) callback(username === creatorUsername);
     });
 }
 
@@ -713,24 +642,20 @@ function reassignCreator(roomID) {
         SELECT userid FROM roomUsers WHERE roomid = ? ORDER BY jointimestamp ASC LIMIT 1
     ) WHERE id = ?;`;
     var params = [roomID, roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function deleteRoomIfEmpty(roomID, callback) {
     var sql = `SELECT userid FROM roomUsers WHERE roomid = ?;`;
     var params = [roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length === 0) {
             sql = `DELETE FROM rooms WHERE id = ?;`;
             params = [roomID];
             mainDB.execute(sql, params, (err, rows) => {
-                if (err) throw err;
-                callback(true);
+                if (callback) callback(true);
             });
-        } else {
+        } else if (callback) {
             callback(false);
         }
     });
@@ -745,7 +670,6 @@ function getDMImage(username, roomID, callback) {
         );`;
     var params = [username, roomID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback && rows.length === 1) callback(rows[0].imageurl);
     });
 }
@@ -757,7 +681,6 @@ function getMessages(roomID, size, callback) {
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createtimestamp ASC;`;
     var params = [roomID, size];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -771,7 +694,6 @@ function getMoreMessages(roomID, size, loadedMessages, callback) {
         ) roomMessages ON users.id = roomMessages.userid ORDER BY createtimestamp DESC;`;
     var params = [roomID, loadedMessages, roomID, size];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows);
     });
 }
@@ -788,17 +710,12 @@ function createMessage(text, username, roomID, callback) {
         );`;
     var params = [text, username, roomID, getTime()];
     var sqlAfter = `SELECT id FROM messages ORDER BY id DESC LIMIT 1;`;
-    mainDB.executeAfter(sql, params, (err, rows) => {
-        if (err) throw err;
-    }, sqlAfter, [], (err, rows) => {
-        if (err) throw err;
+    mainDB.executeAfter(sql, params, null, sqlAfter, [], (err, rows) => {
         if (callback) callback(rows[0].id);
     });
     sql = `UPDATE rooms SET updatetimestamp = ? WHERE id = ?;`;
     params = [getTime(), roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function canManageMessage(username, messageID, callback) {
@@ -808,7 +725,6 @@ function canManageMessage(username, messageID, callback) {
         ) AND id = ?;`;
     var params = [username, messageID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length === 1);
     });
 }
@@ -820,7 +736,6 @@ function getMessageInfo(messageID, callback) {
         ) messages1 JOIN users ON messages1.userid = users.id;`;
     var params = [messageID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows[0]);
     });
 }
@@ -829,7 +744,6 @@ function editMessage(messageID, messageContent, callback) {
     var sql = `UPDATE messages SET text = ? WHERE id = ?;`;
     var params = [messageContent, messageID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback();
     });
 }
@@ -838,7 +752,6 @@ function deleteMessage(messageID, callback) {
     var sql = `DELETE FROM messages WHERE id = ?;`;
     var params = [messageID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback();
     });
 }
@@ -847,7 +760,6 @@ function roomOfMessage(messageID, callback) {
     var sql = `SELECT roomid FROM messages WHERE id = ?;`;
     var params = [messageID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows[0].roomid);
     });
 }
@@ -858,9 +770,7 @@ function readMessage(username, roomID) {
             SELECT id FROM users WHERE username = ?
         ) AND roomid = ?;`;
     var params = [getTime(), username, roomID];
-    mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
-    });
+    mainDB.execute(sql, params);
 }
 
 function emailExists(email, callback) {
@@ -868,7 +778,6 @@ function emailExists(email, callback) {
     var sql = `SELECT email FROM users WHERE email = ?;`;
     var params = [email];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -876,22 +785,17 @@ function emailExists(email, callback) {
 function newPasswordResetID(email, callback) {
     email = email.toLowerCase();
     crypto.randomBytes(hexLength / 2, (err, buffer) => {
-        if (err) throw err;
         var resetID = buffer.toString('hex');
         var sql = `SELECT resetid FROM passwordReset WHERE resetid = ?;`;
         var params = [resetID];
         mainDB.execute(sql, params, (err, rows) => {
-            if (err) throw err;
             if (rows.length > 0) {
                 newPasswordResetID(email, callback);
             } else {
                 sql = `INSERT INTO passwordReset (email, resetid, createtimestamp) VALUES (?, ?, ?);`;
                 params = [email, resetID, getTime()];
                 var sqlAfter = `SELECT resetid FROM passwordReset ORDER BY id DESC LIMIT 1;`;
-                mainDB.executeAfter(sql, params, (err, rows) => {
-                    if (err) throw err;
-                }, sqlAfter, [], (err, rows) => {
-                    if (err) throw err;
+                mainDB.executeAfter(sql, params, null, sqlAfter, [], (err, rows) => {
                     setTimeout(deletePasswordResetID, passwordResetTimeout, rows[0].resetid);
                     if (callback) callback(rows[0].resetid);
                 });
@@ -904,7 +808,6 @@ function checkPasswordResetID(passwordResetID, callback) {
     var sql = `SELECT resetid FROM passwordReset WHERE resetid = ?;`;
     var params = [passwordResetID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length > 0);
     });
 }
@@ -913,7 +816,6 @@ function deletePasswordResetID(passwordResetID, callback) {
     var sql = `DELETE FROM passwordReset WHERE resetid = ?;`;
     var params = [passwordResetID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback();
     });
 }
@@ -925,7 +827,6 @@ function resetPassword(passwordResetID, newPassword) {
         ) passwordReset1 ON users.email = passwordReset1.email;`;
     var params = [passwordResetID];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length === 1) {
             setUserPassword(rows[0].username, newPassword);
             deletePasswordResetID(passwordResetID);
@@ -937,7 +838,6 @@ function uniquePasswordResetEntry(email, callback) {
     var sql = `SELECT email FROM passwordReset WHERE email = ?;`;
     var params = [email];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (callback) callback(rows.length === 0);
     })
 }
@@ -946,18 +846,14 @@ function verifyLogin(username, password, callback) {
     var sql = `SELECT username, password FROM users WHERE username = ? OR email = ?;`;
     var params = [username, username];
     mainDB.execute(sql, params, (err, rows) => {
-        if (err) throw err;
         if (rows.length === 0) {
             if (callback) callback(false);
         } else {
             bcrypt.compare(password, rows[0].password, (err, res) => {
-                if (err) throw err;
                 if (res) {
                     sql = `UPDATE users SET lastlogin = ? WHERE username = ?;`;
                     params = [getTime(), username];
-                    mainDB.execute(sql, params, (err, rows) => {
-                        if (err) throw err;
-                    });
+                    mainDB.execute(sql, params);
                     if (callback) callback(true, rows[0].username);
                 } else if (callback) {
                     callback(false);
