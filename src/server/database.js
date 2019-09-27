@@ -108,6 +108,7 @@ function createUser(username, displayname, email, password, callback) {
             if (callback) callback(false);
         } else {
             bcrypt.hash(password, saltRounds, (err, hash) => {
+                if (err) throw err;
                 sql = `INSERT INTO users (username, displayname, email, password, imageurl, jointimestamp) VALUES (?, ?, ?, ?, ?, ?);`;
                 params = [username, displayname, email, hash, defaultUserImageURL, getTime()];
                 mainDB.execute(sql, params, (err, rows) => {
@@ -120,6 +121,7 @@ function createUser(username, displayname, email, password, callback) {
 
 function setUserPassword(username, newPassword) {
     bcrypt.hash(newPassword, saltRounds, (err, hash) => {
+        if (err) throw err;
         var sql = `UPDATE users SET password = ? WHERE username = ?;`;
         var params = [hash, username];
         mainDB.execute(sql, params);
@@ -785,6 +787,7 @@ function emailExists(email, callback) {
 function newPasswordResetID(email, callback) {
     email = email.toLowerCase();
     crypto.randomBytes(hexLength / 2, (err, buffer) => {
+        if (err) throw err;
         var resetID = buffer.toString('hex');
         var sql = `SELECT resetid FROM passwordReset WHERE resetid = ?;`;
         var params = [resetID];
@@ -850,6 +853,7 @@ function verifyLogin(username, password, callback) {
             if (callback) callback(false);
         } else {
             bcrypt.compare(password, rows[0].password, (err, res) => {
+                if (err) throw err;
                 if (res) {
                     sql = `UPDATE users SET lastlogin = ? WHERE username = ?;`;
                     params = [getTime(), username];
